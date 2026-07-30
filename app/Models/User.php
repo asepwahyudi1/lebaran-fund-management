@@ -49,4 +49,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function getInitialsAttribute(): string
+    {
+        $words = explode(' ', $this->name);
+        $initials = '';
+        foreach ($words as $w) {
+            $initials .= strtoupper(substr($w, 0, 1));
+        }
+        return substr($initials, 0, 2);
+    }
 }

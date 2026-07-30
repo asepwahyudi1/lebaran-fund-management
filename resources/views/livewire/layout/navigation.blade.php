@@ -16,146 +16,36 @@ new class extends Component
     }
 }; ?>
 
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" wire:navigate>
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
-                    </a>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    @if(auth()->user()->isAdmin())
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" wire:navigate>
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.packages')" :active="request()->routeIs('admin.packages')" wire:navigate>
-                            {{ __('Paket Lebaran') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.customers')" :active="request()->routeIs('admin.customers')" wire:navigate>
-                            {{ __('Pelanggan') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.payments')" :active="request()->routeIs('admin.payments')" wire:navigate>
-                            {{ __('Pembayaran') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.reports')" :active="request()->routeIs('admin.reports')" wire:navigate>
-                            {{ __('Laporan') }}
-                        </x-nav-link>
-                    @elseif(auth()->user()->isCustomer())
-                        <x-nav-link :href="route('customer.dashboard')" :active="request()->routeIs('customer.dashboard')" wire:navigate>
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('customer.upload-payment')" :active="request()->routeIs('customer.upload-payment')" wire:navigate>
-                            {{ __('Unggah Bukti') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('customer.payment-history')" :active="request()->routeIs('customer.payment-history')" wire:navigate>
-                            {{ __('Riwayat Pembayaran') }}
-                        </x-nav-link>
-                    @endif
-                </div>
+<div class="flex items-center gap-4">
+    <!-- User Info and Avatar Dropdown -->
+    <div class="relative" x-data="{ dropdownOpen: false }">
+        <button @click="dropdownOpen = ! dropdownOpen" @click.outside="dropdownOpen = false" class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition focus:outline-none">
+            <!-- Initials Avatar -->
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-indigo-500/20">
+                {{ auth()->user()->initials }}
+            </div>
+            
+            <!-- Name & Role -->
+            <div class="hidden md:flex flex-col items-start text-left mr-2">
+                <span class="font-bold text-sm text-gray-800 dark:text-gray-200 leading-none">{{ auth()->user()->name }}</span>
+                <span class="font-bold text-[9px] text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mt-1.5">{{ auth()->user()->role }}</span>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div class="flex flex-col items-start mr-2">
-                                <span class="font-medium text-xs text-gray-400 uppercase tracking-wider">{{ auth()->user()->role }}</span>
-                                <div x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name" class="font-semibold text-sm"></div>
-                            </div>
+            <!-- Arrow Icon -->
+            <svg class="h-4 w-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': dropdownOpen }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+        </button>
 
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile')" wire:navigate>
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <button wire:click="logout" class="w-full text-start">
-                            <x-dropdown-link>
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </button>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+        <!-- Dropdown Menu -->
+        <div x-show="dropdownOpen" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-2xl bg-white dark:bg-gray-900 py-2 shadow-lg ring-1 ring-black/5 dark:ring-white/5 border border-gray-100 dark:border-gray-800 focus:outline-none" style="display: none;">
+            <a href="{{ route('profile') }}" class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-850/50 transition font-medium" wire:navigate>
+                {{ __('Ubah Profil') }}
+            </a>
+            
+            <button wire:click="logout" class="w-full text-left block px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition font-bold border-t border-gray-100 dark:border-gray-800 mt-1">
+                {{ __('Log Out') }}
+            </button>
         </div>
     </div>
-
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            @if(auth()->user()->isAdmin())
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" wire:navigate>
-                    {{ __('Dashboard') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.packages')" :active="request()->routeIs('admin.packages')" wire:navigate>
-                    {{ __('Paket Lebaran') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.customers')" :active="request()->routeIs('admin.customers')" wire:navigate>
-                    {{ __('Pelanggan') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.payments')" :active="request()->routeIs('admin.payments')" wire:navigate>
-                    {{ __('Pembayaran') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.reports')" :active="request()->routeIs('admin.reports')" wire:navigate>
-                    {{ __('Laporan') }}
-                </x-responsive-nav-link>
-            @elseif(auth()->user()->isCustomer())
-                <x-responsive-nav-link :href="route('customer.dashboard')" :active="request()->routeIs('customer.dashboard')" wire:navigate>
-                    {{ __('Dashboard') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('customer.upload-payment')" :active="request()->routeIs('customer.upload-payment')" wire:navigate>
-                    {{ __('Unggah Bukti') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('customer.payment-history')" :active="request()->routeIs('customer.payment-history')" wire:navigate>
-                    {{ __('Riwayat Pembayaran') }}
-                </x-responsive-nav-link>
-            @endif
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800 dark:text-gray-200" x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
-                <div class="font-medium text-sm text-gray-500">{{ auth()->user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile')" wire:navigate>
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <button wire:click="logout" class="w-full text-start">
-                    <x-responsive-nav-link>
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </button>
-            </div>
-        </div>
-    </div>
-</nav>
+</div>

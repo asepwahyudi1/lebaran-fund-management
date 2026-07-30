@@ -82,7 +82,7 @@ DB_CONNECTION=sqlite
 
 1. Buka XAMPP Control Panel, lalu jalankan (**Start**) service **Apache** dan **MySQL**.
 2. Buka phpMyAdmin di browser Anda (`http://localhost/phpmyadmin`).
-3. Buat database baru dengan nama **`lebaran_fund_management`**.
+3. Buat database baru dengan nama **`db_lebaran_fund`**.
 4. Buka file **`.env`** di project Anda, lalu ubah baris konfigurasi database menjadi seperti berikut:
 
 ```env

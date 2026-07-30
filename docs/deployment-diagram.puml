@@ -1,0 +1,30 @@
+@startuml Deployment Diagram - Lebaran Fund Management
+
+skinparam roundcorner 10
+skinparam theme silver
+skinparam packageStyle rectangle
+
+node "<<device>>\n:UserClient" as client {
+    node "Browser" as browser
+}
+
+node "<<device>>\n:ApplicationServer" as app_server {
+    node "<<executionEnvironment>>\nPHP" as web_server {
+        node "Laravel Application" as laravel_app {
+            component "Blade Views" as views
+            component "Livewire Components" as livewire_controllers
+            component "Laravel Router & Middleware" as router
+            component "Eloquent ORM" as eloquent
+        }
+    }
+}
+
+node "<<device>>\n:DatabaseServer" as db_server {
+    component "MySQL Database (XAMPP)" as database
+}
+
+' Relationships
+client -down-> app_server : "<<use>>\nHTTP/HTTPS"
+eloquent -down-> database : "<<use>>\nPDO / SQL (Port 3306)"
+
+@endum

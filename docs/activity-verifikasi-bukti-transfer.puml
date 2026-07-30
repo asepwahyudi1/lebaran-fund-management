@@ -1,0 +1,38 @@
+@startuml Activity Diagram - Verifikasi Bukti Transfer
+
+skinparam theme silver
+skinparam conditionStyle inside
+skinparam roundcorner 10
+
+|Admin|
+start
+:Membuka menu Verifikasi & Pembayaran;
+
+|Sistem|
+:Menampilkan daftar bukti transfer pending;
+
+|Admin|
+:Pilih bukti transfer & klik "Verifikasi";
+:Memeriksa gambar bukti transfer dan rincian data;
+if (Keputusan Verifikasi?) then (Approve / Terima)
+    :Klik tombol "Approve";
+    |Sistem|
+    :Ubah status pembayaran menjadi 'verified';
+    :Catat admin yang memverifikasi dan waktu verifikasi;
+    :Hitung ulang status kelancaran nasabah;
+    :Tampilkan pesan sukses;
+else (Reject / Tolak)
+    |Admin|
+    :Mengisi catatan penolakan;
+    :Klik tombol "Reject";
+    |Sistem|
+    :Ubah status pembayaran menjadi 'rejected';
+    :Simpan catatan penolakan ke database;
+    :Tampilkan pesan sukses;
+endif
+
+|Sistem|
+:Perbarui daftar verifikasi pembayaran;
+stop
+
+@endum

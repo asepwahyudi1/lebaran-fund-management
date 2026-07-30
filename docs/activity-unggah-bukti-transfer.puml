@@ -1,0 +1,29 @@
+@startuml Activity Diagram - Unggah Bukti Transfer
+
+skinparam theme silver
+skinparam conditionStyle inside
+skinparam roundcorner 10
+
+|Pelanggan|
+start
+:Membuka portal dashboard;
+:Klik tombol "Unggah Bukti Transfer";
+:Mengisi Jumlah Setoran (Rp), Tanggal Transfer,\ndan memilih File Gambar Bukti;
+:Klik tombol "Kirim Bukti Transfer";
+
+|Sistem|
+:Validasi input data & format berkas gambar;
+if (Valid & Berkas di bawah 2MB?) then (Ya)
+    :Unggah file bukti ke storage publik;
+    :Simpan data pembayaran dengan status 'pending';
+    :Update Kalender Cicilan pada minggu terkait\nmenjadi Kuning (Bukti Dikirim);
+    :Tampilkan pesan sukses;
+else (Tidak)
+    :Tampilkan error validasi / ukuran file melebihi batas;
+endif
+
+|Sistem|
+:Perbarui dashboard & daftar riwayat setoran nasabah;
+stop
+
+@endum

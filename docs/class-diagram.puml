@@ -1,0 +1,124 @@
+@startuml Class Diagram - Lebaran Fund Management
+
+skinparam roundcorner 10
+skinparam theme silver
+skinparam classAttributeIconSize 0
+
+class User {
+    +id: int
+    +name: string
+    +email: string
+    +password: string
+    +role: string
+    +phone_number: string
+    +address: string
+    +package_id: int
+    +start_date: Date
+    +duration_weeks: int
+    --
+    +getUser()
+    +setUser()
+}
+
+class Package {
+    +id: int
+    +name: string
+    +price: float
+    +description: string
+    +status: string
+    +duration_weeks: int
+    +image_path: string
+    --
+    +getPackage()
+    +setPackage()
+}
+
+class Payment {
+    +id: int
+    +user_id: int
+    +amount: float
+    +payment_date: Date
+    +payment_method: string
+    +proof_path: string
+    +status: string
+    +admin_notes: string
+    +verified_by: int
+    +verified_at: DateTime
+    --
+    +getPayment()
+    +setPayment()
+    +getUser()
+}
+
+class AdminDashboard {
+    --
+    +getDashboard()
+    +getUser()
+}
+
+class Packages {
+    +name: string
+    +price: float
+    +description: string
+    +status: string
+    +duration_weeks: int
+    +image: UploadedFile
+    +existingImage: string
+    +isEditing: bool
+    +editingId: int
+    +isOpen: bool
+    --
+    +savePackage()
+    +deletePackage()
+    +toggleStatus()
+}
+
+class Customers {
+    +name: string
+    +email: string
+    +phone_number: string
+    +address: string
+    +package_id: int
+    +start_date: Date
+    +duration_weeks: int
+    +isOpen: bool
+    +isEditing: bool
+    +editingId: int
+    +isOpenDetail: bool
+    +detailCustomerId: int
+    +detailCustomer: User
+    +detailPayments: array
+    --
+    +saveCustomer()
+    +deleteCustomer()
+    +detailCustomer()
+    +getUser()
+}
+
+class CustomerDashboard {
+    +receipt: UploadedFile
+    +amount: float
+    +payment_date: Date
+    --
+    +getDashboard()
+    +uploadReceipt()
+    +getUser()
+}
+
+' Relations between Models
+User "0..*" --> "1" Package : belongs to
+Package "1" <-- "0..*" User : has many
+User "1" <-- "0..*" Payment : has many
+Payment "0..*" --> "1" User : made by
+Payment "0..*" --> "0..1" User : verified by
+
+' Relations between Controllers and Models
+AdminDashboard ..> User : queries
+AdminDashboard ..> Payment : queries
+Packages ..> Package : manipulates
+Customers ..> User : manipulates
+Customers ..> Package : queries
+CustomerDashboard ..> Payment : creates
+CustomerDashboard ..> User : queries
+
+@endum

@@ -1,0 +1,32 @@
+@startuml Sequence Diagram - Lihat Dashboard Pelanggan
+
+autonumber
+
+actor "Pelanggan (Customer)" as customer
+boundary "Halaman Dashboard" as view
+control "DashboardComponent (Livewire)" as controller
+entity "User Model" as user
+entity "Package Model" as package
+
+customer -> view : login & mengakses halaman dashboard
+view -> controller : onLoad page
+activate controller
+controller -> user : get profil & history pembayaran
+activate user
+user --> controller : return customer data
+deactivate user
+
+controller -> user : getInstallmentCalendar()
+activate user
+user --> controller : return weeks array (status & deadlines)
+deactivate user
+
+controller -> package : get package image & details
+activate package
+package --> controller : return image_url
+deactivate package
+
+controller --> view : menampilkan info paket, progress bar, & Kalender Cicilan
+deactivate controller
+
+@endum

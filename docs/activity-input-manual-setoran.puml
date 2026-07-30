@@ -1,0 +1,29 @@
+@startuml Activity Diagram - Input Manual Setoran
+
+skinparam theme silver
+skinparam conditionStyle inside
+skinparam roundcorner 10
+
+|Admin|
+start
+:Membuka menu Data Pelanggan;
+:Klik detail progress pelanggan terpilih;
+:Klik tombol "Input Manual";
+:Mengisi Jumlah Setoran (Rp) dan Tanggal Pembayaran;
+:Klik tombol "Simpan Pembayaran";
+
+|Sistem|
+:Validasi input data nominal dan tanggal;
+if (Valid?) then (Ya)
+    :Simpan data pembayaran dengan status 'verified';
+    :Hitung ulang status kelancaran tabungan\ndan update Kalender Cicilan;
+    :Tampilkan pesan sukses;
+else (Tidak)
+    :Tampilkan error validasi;
+endif
+
+|Sistem|
+:Perbarui modal detail pelanggan secara real-time;
+stop
+
+@endum

@@ -1,0 +1,45 @@
+@startuml Activity Diagram - Kelola Data Pelanggan
+
+skinparam theme silver
+skinparam conditionStyle inside
+skinparam roundcorner 10
+
+|Admin|
+start
+:Membuka menu Data Pelanggan;
+
+|Sistem|
+:Menampilkan daftar pelanggan dan status cicilan;
+
+|Admin|
+if (Pilih Aksi?) then (Tambah / Edit Pelanggan)
+    :Mengisi formulir data pelanggan\n(Nama, Email, No. HP, Alamat, Sandi,\nPaket Terpilih, Tgl Mulai, & Durasi Kustom);
+    |Sistem|
+    :Validasi input data;
+    if (Valid?) then (Ya)
+        :Simpan/update data pelanggan ke database;
+        :Tampilkan pesan sukses;
+    else (Tidak)
+        :Tampilkan error validasi;
+    endif
+elseif (Hapus Pelanggan) then
+    |Admin|
+    :Klik tombol Hapus Pelanggan;
+    |Sistem|
+    :Hapus data pelanggan dan bukti transfernya;
+    :Tampilkan pesan sukses;
+elseif (Lihat Progress & Kalender) then
+    |Admin|
+    :Klik detail pelanggan (ikon mata);
+    |Sistem|
+    :Hitung minggu berjalan (elapsed_weeks);
+    :Alokasikan setoran berurutan per minggu;
+    :Tentukan status tiap minggu\n(Hijau, Kuning, Merah, Abu-abu);
+    :Tampilkan modal detail pelanggan\nlengkap dengan widget Kalender Cicilan;
+endif
+
+|Sistem|
+:Memperbarui tampilan daftar pelanggan;
+stop
+
+@endum

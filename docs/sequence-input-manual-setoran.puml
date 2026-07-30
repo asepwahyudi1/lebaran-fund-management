@@ -1,0 +1,33 @@
+@startuml Sequence Diagram - Input Manual Setoran
+
+autonumber
+
+actor "Admin (Pengelola)" as admin
+boundary "Halaman Data Pelanggan" as view
+control "CustomersComponent (Livewire)" as controller
+entity "Payment Model" as payment
+entity "User Model (Customer)" as customer
+
+admin -> view : menekan tombol detail pelanggan
+admin -> view : klik tombol "Input Manual"
+admin -> view : mengisi nominal & tanggal pembayaran
+admin -> view : klik tombol "Simpan Pembayaran"
+
+view -> controller : savePayment(amount, date)
+activate controller
+controller -> controller : validate()
+
+controller -> payment : create(status='verified')
+activate payment
+payment --> controller : return success
+deactivate payment
+
+controller -> customer : recalculate status & calendar
+activate customer
+customer --> controller : return updated data
+deactivate customer
+
+controller --> view : menampilkan notif sukses & update modal detail
+deactivate controller
+
+@endum

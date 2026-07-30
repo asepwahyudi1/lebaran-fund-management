@@ -1,0 +1,38 @@
+@startuml Sequence Diagram - Lihat & Cetak Laporan
+
+autonumber
+
+actor "Admin (Pengelola)" as admin
+boundary "Halaman Laporan" as view
+control "ReportsComponent (Livewire)" as controller
+entity "User Model (Customer)" as customer
+
+admin -> view : membuka halaman laporan
+view -> controller : onLoad page
+activate controller
+controller -> customer : get data nasabah & keuangan
+activate customer
+customer --> controller : return data
+deactivate customer
+controller --> view : menampilkan ringkasan kas & tabel nasabah
+deactivate controller
+
+alt Filter Data
+    admin -> view : memilih filter status cicilan
+    view -> controller : filterStatus(value)
+    activate controller
+    controller -> customer : filter data
+    activate customer
+    customer --> controller : return filtered data
+    deactivate customer
+    controller --> view : update tabel nasabah
+    deactivate controller
+end
+
+admin -> view : klik tombol "Cetak Laporan / Print"
+activate view
+view -> view : panggil window.print()
+view --> admin : menampilkan print dialog browser
+deactivate view
+
+@endum

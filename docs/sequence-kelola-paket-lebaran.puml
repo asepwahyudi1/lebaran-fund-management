@@ -1,0 +1,64 @@
+@startuml Sequence Diagram - Kelola Paket Lebaran
+
+autonumber
+
+actor "Admin (Pengelola)" as admin
+boundary "Halaman Kelola Paket" as view
+control "PackagesComponent (Livewire)" as controller
+entity "Package Model" as model
+entity "Storage Disk" as storage
+
+admin -> view : mengakses halaman kelola paket
+view -> controller : onLoad page
+activate controller
+controller -> model : get data paket
+activate model
+model --> controller : return list paket
+deactivate model
+controller --> view : menampilkan list paket
+deactivate controller
+
+alt Tambah / Edit Paket
+    admin -> view : mengisi form & input gambar
+    admin -> view : menekan tombol simpan
+    view -> controller : save(data, image)
+    activate controller
+    controller -> controller : validate()
+    alt ada gambar diunggah
+        controller -> storage : store('packages', 'public')
+        activate storage
+        storage --> controller : return image_path
+        deactivate storage
+        alt mode edit & ada gambar lama
+            controller -> storage : delete(old_image_path)
+        end
+    end
+    controller -> model : updateOrCreate(editingId, data)
+    activate model
+    model --> controller : return success
+    deactivate model
+    controller --> view : menampilkan notif sukses
+    deactivate controller
+    
+else Hapus Paket
+    admin -> view : menekan tombol hapus
+    view -> controller : delete(id)
+    activate controller
+    controller -> model : count users using package
+    activate model
+    model --> controller : return count
+    deactivate model
+    alt count > 0 (sedang digunakan)
+        controller --> view : tampilkan error ("Sedang digunakan")
+    else count = 0 (bisa dihapus)
+        controller -> storage : delete(image_path)
+        controller -> model : delete()
+        activate model
+        model --> controller : return success
+        deactivate model
+        controller --> view : menampilkan notif sukses
+    end
+    deactivate controller
+end
+
+@endum

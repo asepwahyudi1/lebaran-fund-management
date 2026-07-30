@@ -1,0 +1,36 @@
+@startuml Activity Diagram - Lihat Dashboard Pelanggan
+
+skinparam theme silver
+skinparam conditionStyle inside
+skinparam roundcorner 10
+
+|Pelanggan|
+start
+:Login ke sistem;
+
+|Sistem|
+:Memuat profil pelanggan dan paket terkait;
+:Hitung minggu berjalan (elapsed_weeks) sejak start_date;
+:Hitung akumulasi kewajiban tabungan (expected_paid_amount);
+:Bandingkan dengan total verified setoran;
+if (Verified setoran >= Kewajiban?) then (Ya)
+    :Set status = "Lancar";
+else (Tidak)
+    :Set status = "Menunggak";
+    :Hitung nominal tunggakan (arrears_amount);
+endif
+
+:Alokasikan setoran berurutan per minggu;
+:Buat array status minggu untuk Kalender Cicilan;
+
+:Tampilkan halaman Dashboard:
+- Informasi Paket + Gambar Paket
+- Progres Bar Persentase
+- Badge Peringatan Tunggakan (jika Menunggak)
+- Grid Kalender Cicilan (Warna-warni);
+
+|Pelanggan|
+:Melihat status tabungan mingguan;
+stop
+
+@endum

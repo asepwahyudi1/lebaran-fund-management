@@ -1,0 +1,33 @@
+@startuml Sequence Diagram - Login Akun
+
+autonumber
+
+actor "Pengguna" as user
+boundary "Halaman Login" as loginView
+control "LoginComponent (Livewire)" as authClass
+entity "User Model" as userEntity
+
+user -> loginView : mengakses halaman login
+loginView -> authClass : onLoad login page
+authClass --> loginView : menampilkan form login
+
+user -> loginView : memasukkan email & password
+user -> loginView : menekan tombol masuk
+
+loginView -> authClass : onClick tombol masuk / login(email, password)
+activate authClass
+authClass -> userEntity : verify credentials(email, password)
+activate userEntity
+userEntity --> authClass : return user data
+deactivate userEntity
+
+alt email & password cocok
+    authClass --> loginView : menampilkan notif login berhasil
+    authClass --> loginView : mengarahkan ke halaman utama (dashboard)
+else salah credentials
+    authClass --> loginView : return error (salah password / email)
+    authClass --> loginView : menampilkan pesan error login
+end
+deactivate authClass
+
+@endum

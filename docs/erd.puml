@@ -1,0 +1,61 @@
+@startuml Entity Relationship Diagram - Lebaran Fund Management
+
+left to right direction
+
+skinparam roundcorner 10
+skinparam theme silver
+skinparam linetype ortho
+
+entity "packages" as packages {
+    * id : INT (PK)
+    --
+    * name : VARCHAR
+    * price : DECIMAL
+    description : TEXT
+    * status : VARCHAR
+    * duration_weeks : INT
+    image_path : VARCHAR
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "users" as users {
+    * id : INT (PK)
+    --
+    * name : VARCHAR
+    * email : VARCHAR (UNIQUE)
+    email_verified_at : TIMESTAMP
+    * password : VARCHAR
+    role : VARCHAR
+    phone_number : VARCHAR (UNIQUE)
+    address : TEXT
+    package_id : INT (FK)
+    start_date : DATE
+    * duration_weeks : INT
+    remember_token : VARCHAR
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "payments" as payments {
+    * id : INT (PK)
+    --
+    * user_id : INT (FK)
+    * amount : DECIMAL
+    * payment_date : DATE
+    * payment_method : VARCHAR
+    proof_path : VARCHAR
+    * status : VARCHAR
+    admin_notes : TEXT
+    verified_by : INT (FK)
+    verified_at : TIMESTAMP
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+' Relationships
+packages ||..o{ users : "package_id"
+users ||..o{ payments : "user_id"
+users ||..o{ payments : "verified_by"
+
+@endum

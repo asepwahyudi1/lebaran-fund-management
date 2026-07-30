@@ -1,0 +1,34 @@
+@startuml Activity Diagram - Lihat & Cetak Laporan
+
+skinparam theme silver
+skinparam conditionStyle inside
+skinparam roundcorner 10
+
+|Admin|
+start
+:Membuka menu Laporan Keuangan;
+
+|Sistem|
+:Memuat ringkasan kas (Total Terkumpul, Saldo Pending, Tunggakan);
+:Menampilkan daftar nasabah beserta status pembayarannya;
+
+|Admin|
+if (Filter Data?) then (Ya)
+    :Memilih filter status cicilan\n(Lancar / Menunggak / Lunas);
+    |Sistem|
+    :Menyaring daftar nasabah sesuai filter;
+else (Tidak)
+endif
+
+|Admin|
+:Klik tombol "Cetak Laporan / Print";
+
+|Sistem|
+:Mengubah tata letak halaman menjadi print-friendly;
+:Memicu fungsi window.print() browser;
+
+|Admin|
+:Menentukan printer / simpan PDF di sistem dialog;
+stop
+
+@endum

@@ -1,0 +1,61 @@
+@startuml Sequence Diagram - Kelola Data Pelanggan
+
+autonumber
+
+actor "Admin (Pengelola)" as admin
+boundary "Halaman Data Pelanggan" as view
+control "CustomersComponent (Livewire)" as controller
+entity "User Model (Customer)" as model
+entity "Package Model" as pkgModel
+
+admin -> view : mengakses halaman data pelanggan
+view -> controller : onLoad page
+activate controller
+controller -> model : get data pelanggan
+activate model
+model --> controller : return list pelanggan
+deactivate model
+controller --> view : menampilkan list pelanggan
+deactivate controller
+
+alt Pilih Paket & Auto-populate Durasi
+    admin -> view : memilih paket di dropdown
+    view -> controller : updatedPackageId(id)
+    activate controller
+    controller -> pkgModel : find(id)
+    activate pkgModel
+    pkgModel --> controller : return data paket
+    deactivate pkgModel
+    controller --> view : isi otomatis input durasi cicilan (default paket)
+    deactivate controller
+    
+else Simpan Pelanggan (Tambah / Edit)
+    admin -> view : mengisi form & input durasi kustom
+    admin -> view : menekan tombol simpan
+    view -> controller : save(data)
+    activate controller
+    controller -> controller : validate()
+    controller -> model : updateOrCreate(editingId, data)
+    activate model
+    model --> controller : return success
+    deactivate model
+    controller --> view : menampilkan notif sukses
+    deactivate controller
+    
+else Lihat Detail & Kalender Cicilan
+    admin -> view : menekan tombol detail (ikon mata)
+    view -> controller : showDetail(id)
+    activate controller
+    controller -> model : findOrFail(id)
+    activate model
+    model --> controller : return detailCustomer
+    deactivate model
+    controller -> model : getInstallmentCalendar()
+    activate model
+    model --> controller : return weeks array (status & deadline)
+    deactivate model
+    controller --> view : menampilkan modal detail & widget Kalender Cicilan
+    deactivate controller
+end
+
+@endum

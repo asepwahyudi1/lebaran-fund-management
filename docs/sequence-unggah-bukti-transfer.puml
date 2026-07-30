@@ -1,0 +1,32 @@
+@startuml Sequence Diagram - Unggah Bukti Transfer
+
+autonumber
+
+actor "Pelanggan (Customer)" as customer
+boundary "Halaman Dashboard" as view
+control "DashboardComponent (Livewire)" as controller
+entity "Payment Model" as payment
+entity "Storage Disk" as storage
+
+customer -> view : menekan tombol "Unggah Bukti Transfer"
+customer -> view : mengisi nominal, tanggal transfer & file gambar
+customer -> view : menekan tombol "Kirim Bukti Transfer"
+
+view -> controller : uploadReceipt(amount, date, file)
+activate controller
+controller -> controller : validate()
+
+controller -> storage : store('receipts', 'public')
+activate storage
+storage --> controller : return proof_path
+deactivate storage
+
+controller -> payment : create(status='pending', proof_path)
+activate payment
+payment --> controller : return success
+deactivate payment
+
+controller --> view : menampilkan notif sukses & ubah kotak Kalender Cicilan menjadi Kuning (Pending)
+deactivate controller
+
+@endum

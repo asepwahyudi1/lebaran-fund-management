@@ -1,0 +1,53 @@
+@startuml Activity Diagram - Kelola Paket Lebaran
+
+skinparam theme silver
+skinparam conditionStyle inside
+skinparam roundcorner 10
+
+|Admin|
+start
+:Membuka menu Kelola Paket;
+
+|Sistem|
+:Menampilkan daftar paket Lebaran;
+
+|Admin|
+if (Pilih Aksi?) then (Tambah / Edit Paket)
+    :Mengisi formulir paket\n(Nama, Harga, Durasi, Deskripsi)\ndan mengunggah Gambar Paket;
+    |Sistem|
+    :Validasi input data & berkas gambar;
+    if (Valid?) then (Ya)
+        if (Unggah gambar baru?) then (Ya)
+            :Simpan gambar baru ke storage;\nJika edit, hapus gambar lama dari storage;
+        endif
+        :Simpan data paket ke database;
+        :Tampilkan pesan sukses;
+    else (Tidak)
+        :Tampilkan error validasi;
+    endif
+elseif (Toggle Status) then
+    |Admin|
+    :Klik status keaktifan paket;
+    |Sistem|
+    :Ubah status paket (active/inactive);
+    :Simpan perubahan status ke database;
+    :Tampilkan pesan sukses;
+elseif (Hapus Paket) then
+    |Admin|
+    :Klik tombol Hapus Paket;
+    |Sistem|
+    :Periksa keterkaitan nasabah;
+    if (Sedang digunakan nasabah?) then (Ya)
+        :Tampilkan pesan error;\nProses hapus dibatalkan;
+    else (Tidak)
+        :Hapus file gambar paket dari storage;
+        :Hapus data paket dari database;
+        :Tampilkan pesan sukses;
+    endif
+endif
+
+|Sistem|
+:Memperbarui tampilan daftar paket;
+stop
+
+@endum

@@ -1,0 +1,51 @@
+@startuml Sequence Diagram - Verifikasi Bukti Transfer
+
+autonumber
+
+actor "Admin (Pengelola)" as admin
+boundary "Halaman Verifikasi" as view
+control "VerifyPaymentsComponent (Livewire)" as controller
+entity "Payment Model" as payment
+entity "User Model (Customer)" as customer
+
+admin -> view : membuka halaman verifikasi
+view -> controller : onLoad page
+activate controller
+controller -> payment : get pending payments
+activate payment
+payment --> controller : return pending list
+deactivate payment
+controller --> view : menampilkan daftar pembayaran pending
+deactivate controller
+
+admin -> view : klik "Verifikasi" & periksa gambar bukti
+
+alt Approve (Setujui)
+    admin -> view : menekan tombol "Approve"
+    view -> controller : approvePayment(id)
+    activate controller
+    controller -> payment : update(status='verified')
+    activate payment
+    payment --> controller : return success
+    deactivate payment
+    controller -> customer : recalculate status & calendar
+    activate customer
+    customer --> controller : return success
+    deactivate customer
+    controller --> view : menampilkan notif sukses & update baris tabel
+    deactivate controller
+    
+else Reject (Tolak)
+    admin -> view : menginput catatan penolakan
+    admin -> view : menekan tombol "Reject"
+    view -> controller : rejectPayment(id, notes)
+    activate controller
+    controller -> payment : update(status='rejected', admin_notes)
+    activate payment
+    payment --> controller : return success
+    deactivate payment
+    controller --> view : menampilkan notif sukses & update baris tabel
+    deactivate controller
+end
+
+@endum

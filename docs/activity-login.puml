@@ -1,0 +1,36 @@
+@startuml Activity Diagram - Login Akun
+
+skinparam theme silver
+skinparam conditionStyle inside
+skinparam roundcorner 10
+
+|Pengguna|
+start
+:Membuka halaman login;
+:Memasukkan Email/Nomor Telepon dan Password;
+:Klik tombol "Log In";
+
+|Sistem|
+:Validasi format input;
+if (Format valid?) then (Ya)
+    :Mencocokkan kredensial di database;
+    if (Kredensial cocok?) then (Ya)
+        :Membuat session pengguna;
+        if (Role pengguna?) then (Admin)
+            :Redirect ke Admin Dashboard;
+        else (Pelanggan)
+            :Redirect ke Customer Dashboard;
+        endif
+        stop
+    else (Tidak)
+        :Tampilkan error "Kredensial tidak cocok";
+    endif
+else (Tidak)
+    :Tampilkan error validasi format;
+endif
+
+|Pengguna|
+:Kembali ke Form Login;
+stop
+
+@endum

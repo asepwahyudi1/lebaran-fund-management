@@ -1,58 +1,177 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Aplikasi Pengelolaan Dana Paket Lebaran - UMKM Sumber Sari
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi Pengelolaan Dana Paket Lebaran Berbasis Web merupakan sistem administrasi pengelolaan data pelanggan, pencatatan pembayaran cicilan, unggah bukti transfer, verifikasi pembayaran, serta penyusunan laporan otomatis untuk usaha paket Lebaran pada UMKM Sumber Sari.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🛠️ Prasyarat (Prerequisites)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Sebelum menjalankan aplikasi, pastikan komputer Anda sudah terinstal:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **PHP** (minimal versi 8.2 atau lebih baru, direkomendasikan 8.3/8.4)
+- **Composer** (untuk dependensi PHP)
+- **Node.js & npm** (untuk aset frontend)
+- Driver database **SQLite** (bawaan PHP)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## ⚙️ Langkah Instalasi
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Ikuti langkah-langkah di bawah ini untuk menjalankan aplikasi dari awal di komputer lokal Anda:
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 1. Clone Repository
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Unduh/clone repository ini ke komputer lokal Anda:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/asepwahyudi1/lebaran-fund-management.git
+cd lebaran-fund-management
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Instal Dependensi PHP (Composer)
 
-## Contributing
+Jalankan perintah berikut untuk menginstal package Laravel & Livewire:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+```
 
-## Code of Conduct
+### 3. Instal Dependensi Frontend (npm)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Jalankan perintah berikut untuk menginstal package CSS & Javascript:
 
-## Security Vulnerabilities
+```bash
+npm install
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4. Konfigurasi Environment File
 
-## License
+Salin file `.env.example` menjadi `.env`:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+cp .env.example .env
+```
+
+### 5. Generate Application Key
+
+Jalankan perintah generator key Laravel:
+
+```bash
+php artisan key:generate
+```
+
+### 6. Konfigurasi Database
+
+Anda dapat memilih untuk menggunakan **SQLite** (default/praktis untuk dicoba) atau **MySQL** (XAMPP).
+
+#### Opsi A: Menggunakan SQLite (Default)
+
+Buat file database kosong (jika belum dibuat otomatis):
+
+```bash
+touch database/database.sqlite
+```
+
+_Pastikan di file `.env` Anda, variabel database diatur sebagai berikut:_
+
+```env
+DB_CONNECTION=sqlite
+```
+
+#### Opsi B: Menggunakan MySQL (XAMPP)
+
+1. Buka XAMPP Control Panel, lalu jalankan (**Start**) service **Apache** dan **MySQL**.
+2. Buka phpMyAdmin di browser Anda (`http://localhost/phpmyadmin`).
+3. Buat database baru dengan nama **`lebaran_fund_management`**.
+4. Buka file **`.env`** di project Anda, lalu ubah baris konfigurasi database menjadi seperti berikut:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_lebaran_fund
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+_(Sesuaikan `DB_PASSWORD` jika MySQL XAMPP Anda memiliki password, biarkan kosong jika menggunakan default)._
+
+### 7. Jalankan Migrasi & Seeder Database
+
+Perintah ini akan membuat semua struktur tabel dan mengisi data awal (Admin, Paket, dan Pelanggan):
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+### 8. Hubungkan Storage Link
+
+Hubungkan folder unggahan agar bukti transfer gambar dapat diakses secara publik di browser:
+
+```bash
+php artisan storage:link
+```
+
+### 9. Build Aset Frontend
+
+Lakukan kompilasi file Tailwind CSS dan Alpine.js:
+
+```bash
+# Untuk mode produksi (rekomendasi sekali jalan)
+npm run build
+
+# ATAU jalankan mode development (jika ingin mengubah kode frontend/css secara real-time)
+npm run dev
+```
+
+---
+
+## 🚀 Cara Menjalankan Aplikasi
+
+1. Jalankan development server PHP:
+    ```bash
+    php artisan serve
+    ```
+2. Aplikasi akan berjalan di alamat: **`http://127.0.0.1:8000`**
+3. Buka alamat tersebut pada browser Anda.
+
+---
+
+## 🔑 Akun Uji Coba (Pre-seeded Credentials)
+
+Anda dapat langsung mencoba login menggunakan akun demo berikut:
+
+### 👤 Peran: Admin (Pengelola)
+
+- **Email:** `admin@sumbersari.com`
+- **Password:** `admin123`
+- **Hak Akses:** Kelola Pelanggan, Kelola Paket, Verifikasi Bukti Transfer (Approve/Reject), Manual Input Pembayaran, Cetak Laporan.
+
+### 👥 Peran: Pelanggan (Customers)
+
+Pengguna dapat login menggunakan **Email** maupun **Nomor Telepon**:
+
+1. **Ahmad Hidayat**
+    - **Email / Nomor Telepon:** `ahmad@gmail.com` atau `085711122233`
+    - **Password:** `password`
+    - **Paket:** Paket Sembako Hemat (Rp 1.200.000)
+
+2. **Siti Rahma**
+    - **Email / Nomor Telepon:** `siti@gmail.com` atau `081988877766`
+    - **Password:** `password`
+    - **Paket:** Paket Sembako Premium (Rp 2.400.000)
+
+3. **Budi Prasetyo**
+    - **Email / Nomor Telepon:** `budi@gmail.com` atau `081299988877`
+    - **Password:** `password`
+    - **Paket:** Paket Kue Lebaran (Rp 800.000)
+
+---
+
+## 🧪 Cara Menjalankan Pengujian (Testing)
+
+Aplikasi ini sudah dilengkapi dengan unit & feature testing. Jalankan perintah berikut untuk memvalidasi seluruh alur kerja autentikasi dan otorisasi:
+
+```bash
+php artisan test
+```

@@ -6,6 +6,7 @@ use App\Models\Package;
 use App\Models\User;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -59,6 +60,7 @@ class Customers extends Component
         $this->resetPage();
     }
 
+    #[On('open-customer-modal-event')]
     public function openModal()
     {
         $this->resetInputFields();

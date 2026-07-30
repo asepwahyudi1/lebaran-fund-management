@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Package;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Packages extends Component
@@ -23,6 +24,7 @@ class Packages extends Component
         'status' => 'required|in:active,inactive',
     ];
 
+    #[On('open-package-modal-event')]
     public function openModal()
     {
         $this->resetInputFields();

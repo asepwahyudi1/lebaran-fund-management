@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Payment;
 use App\Models\User;
 use Carbon\Carbon;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -45,6 +46,7 @@ class Payments extends Component
     }
 
     // Manual Payment Methods
+    #[On('open-manual-modal-event')]
     public function openManualModal()
     {
         $this->resetManualFields();

@@ -1,0 +1,47 @@
+@startuml Lebaran Fund Management - Use Case Diagram
+
+left to right direction
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam roundcorner 10
+skinparam theme silver
+
+actor "Admin (Pengelola)" as admin
+actor "Pelanggan (Customer)" as customer
+
+rectangle "Sistem Manajemen Tabungan Lebaran Sumber Sari" {
+    usecase "Login Akun" as UC_Login
+    
+    ' Admin Use Cases
+    usecase "Kelola Paket Lebaran" as UC_ManagePackages
+    usecase "Kelola Data Pelanggan" as UC_ManageCustomers
+    usecase "Input Manual Setoran" as UC_ManualPayment
+    usecase "Verifikasi Bukti Transfer" as UC_VerifyPayment
+    usecase "Lihat & Cetak Laporan Keuangan" as UC_PrintReports
+    
+    ' Customer Use Cases
+    usecase "Lihat Dashboard Pelanggan" as UC_ViewDashboard
+    usecase "Lihat Kalender Cicilan" as UC_ViewCalendar
+    usecase "Unggah Bukti Transfer" as UC_UploadReceipt
+    usecase "Lihat Riwayat Pembayaran" as UC_ViewHistory
+}
+
+' General Relationship
+admin --> UC_Login
+customer --> UC_Login
+
+' Admin Relationships
+admin --> UC_ManagePackages
+admin --> UC_ManageCustomers
+admin --> UC_ManualPayment
+admin --> UC_VerifyPayment
+admin --> UC_PrintReports
+
+' Customer Relationships
+customer --> UC_ViewDashboard
+customer --> UC_ViewCalendar
+customer --> UC_UploadReceipt
+customer --> UC_ViewHistory
+
+@endum

@@ -53,6 +53,7 @@
                         <th class="py-4 px-6">Pelanggan</th>
                         <th class="py-4 px-6">Kontak</th>
                         <th class="py-4 px-6">Paket Terpilih</th>
+                        <th class="py-4 px-6 text-center">Status Cicilan</th>
                         <th class="py-4 px-6 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -84,6 +85,20 @@
                                     </div>
                                 @else
                                     <span class="text-xs text-gray-400 dark:text-gray-500">Belum memilih paket</span>
+                                @endif
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                @if ($c->package)
+                                    <div class="flex flex-col items-center gap-1">
+                                        @if ($c->weekly_status === 'Lancar')
+                                            <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-md dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">Lancar</span>
+                                        @else
+                                            <span class="px-2 py-0.5 text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 rounded-md dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30">Menunggak</span>
+                                            <span class="text-[9px] text-rose-500 font-bold">Tunggakan: Rp {{ number_format($c->arrears_amount, 0, ',', '.') }}</span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="text-xs text-gray-400">-</span>
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-center">
@@ -183,6 +198,19 @@
                         @error('package_id') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="start_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tanggal Mulai Menabung</label>
+                            <input wire:model="start_date" type="date" id="start_date" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                            @error('start_date') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label for="duration_weeks" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Durasi Cicilan (Minggu)</label>
+                            <input wire:model="duration_weeks" type="number" id="duration_weeks" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Contoh: 40" required>
+                            @error('duration_weeks') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
                     <div>
                         <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                             Password Login {{ $isEditing ? '(Kosongkan jika tidak ingin diubah)' : '' }}
@@ -243,6 +271,45 @@
                         </div>
                     </div>
 
+                    <!-- Weekly Installment Plan -->
+                    @if ($detailCustomer->package)
+                        <div class="mb-6 p-4 rounded-xl border {{ $detailCustomer->weekly_status === 'Lancar' ? 'bg-emerald-50/30 border-emerald-100 dark:bg-emerald-950/5 dark:border-emerald-900/20' : 'bg-rose-50/30 border-rose-100 dark:bg-rose-950/5 dark:border-rose-900/20' }}">
+                            <h4 class="font-bold text-xs uppercase tracking-wider text-gray-500 mb-3">Status Cicilan Mingguan</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-xs text-gray-400">Minggu Berjalan:</span>
+                                    <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Minggu ke-{{ $detailCustomer->current_week }} dari {{ $detailCustomer->package->duration_weeks }} mgg</div>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-400">Cicilan Mingguan:</span>
+                                    <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Rp {{ number_format($detailCustomer->package->weekly_installment, 0, ',', '.') }} / mgg</div>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-400">Status Tabungan:</span>
+                                    <div class="mt-0.5">
+                                        @if ($detailCustomer->weekly_status === 'Lancar')
+                                            <span class="px-2 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-md dark:bg-emerald-900/40 dark:text-emerald-300">Lancar (Up to Date)</span>
+                                        @else
+                                            <span class="px-2 py-0.5 text-xs font-bold bg-rose-100 text-rose-800 rounded-md dark:bg-rose-900/40 dark:text-rose-300">Menunggak</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-400">Tenggat Minggu Ini:</span>
+                                    <div class="font-bold text-sm text-gray-800 dark:text-gray-200">
+                                        {{ $detailCustomer->current_week_deadline ? $detailCustomer->current_week_deadline->format('d M Y') : '-' }}
+                                    </div>
+                                </div>
+                            </div>
+                            @if ($detailCustomer->weekly_status === 'Menunggak')
+                                <div class="mt-4 pt-3 border-t border-rose-100/55 dark:border-rose-900/20 text-xs font-semibold text-rose-700 dark:text-rose-450 flex items-center justify-between">
+                                    <span>Total Tunggakan:</span>
+                                    <span class="text-sm font-bold text-rose-600 dark:text-rose-400">Rp {{ number_format($detailCustomer->arrears_amount, 0, ',', '.') }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
                     <!-- Progress Section -->
                     <div class="mb-8">
                         <div class="flex items-center justify-between text-sm font-semibold mb-2">
@@ -277,6 +344,60 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Kalender Cicilan -->
+                    @if ($detailCustomer && $detailCustomer->package)
+                        <div class="mb-8 p-4 rounded-xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                                <div>
+                                    <h4 class="font-bold text-xs uppercase tracking-wider text-gray-500">Kalender Cicilan</h4>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">{{ $detailCustomer->duration_weeks }} minggu cicilan</p>
+                                </div>
+                                
+                                <!-- Legenda -->
+                                <div class="flex flex-wrap gap-x-3 gap-y-1.5 text-[10px] font-semibold text-gray-500 dark:text-gray-400">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2.5 h-2.5 rounded bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"></div>
+                                        <span>Belum</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2.5 h-2.5 rounded bg-amber-500 shadow-xs"></div>
+                                        <span>Pending</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2.5 h-2.5 rounded bg-emerald-500 shadow-xs"></div>
+                                        <span>Lunas</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2.5 h-2.5 rounded bg-rose-500 shadow-xs"></div>
+                                        <span>Telat</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Weeks Grid -->
+                            <div class="grid grid-cols-6 sm:grid-cols-10 gap-2">
+                                @foreach ($detailCustomer->getInstallmentCalendar() as $week)
+                                    @php
+                                        $statusClass = '';
+                                        if ($week['status'] === 'verified') {
+                                            $statusClass = 'bg-emerald-500 text-white shadow-xs border-emerald-600';
+                                        } elseif ($week['status'] === 'pending') {
+                                            $statusClass = 'bg-amber-500 text-white shadow-xs border-amber-600';
+                                        } elseif ($week['status'] === 'late') {
+                                            $statusClass = 'bg-rose-500 text-white shadow-xs border-rose-600';
+                                        } else {
+                                            $statusClass = 'bg-gray-50 dark:bg-gray-850/40 text-gray-400 dark:text-gray-500 border-gray-150 dark:border-gray-800';
+                                        }
+                                    @endphp
+                                    <div class="aspect-square flex flex-col items-center justify-center rounded-lg border font-bold text-[10px] transition duration-200 cursor-help {{ $statusClass }}" 
+                                         title="Minggu {{ $week['number'] }} • Tenggat: {{ $week['deadline'] ? $week['deadline']->format('d M Y') : '-' }} • Status: {{ ucfirst($week['status']) }}">
+                                        <span>{{ $week['number'] }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Payments History Section -->
                     <div>

@@ -33,6 +33,105 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left 2 Cols: Progress and Info -->
             <div class="lg:col-span-2 space-y-8">
+                <!-- Status Cicilan Mingguan Card -->
+                <div class="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl p-6 shadow-sm {{ $customer->weekly_status === 'Lancar' ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500' }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-white">Status Cicilan Mingguan</h3>
+                        @if ($customer->weekly_status === 'Lancar')
+                            <span class="px-2.5 py-1 text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl dark:bg-emerald-950/20 dark:text-emerald-400">Lancar (Up to Date)</span>
+                        @else
+                            <span class="px-2.5 py-1 text-xs font-bold bg-rose-50 text-rose-600 border border-rose-100 rounded-xl dark:bg-rose-950/20 dark:text-rose-400">Ada Tunggakan</span>
+                        @endif
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-4 border border-gray-100 dark:border-gray-800">
+                            <span class="text-[10px] text-gray-400 uppercase font-semibold">Cicilan Mingguan</span>
+                            <div class="font-extrabold text-lg text-gray-900 dark:text-white mt-1">Rp {{ number_format($customer->package->weekly_installment, 0, ',', '.') }}</div>
+                            <span class="text-[10px] text-gray-500">per minggu</span>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-4 border border-gray-100 dark:border-gray-800">
+                            <span class="text-[10px] text-gray-400 uppercase font-semibold">Minggu Berjalan</span>
+                            <div class="font-extrabold text-lg text-gray-900 dark:text-white mt-1">Minggu ke-{{ $customer->current_week }}</div>
+                            <span class="text-[10px] text-gray-500">dari {{ $customer->package->duration_weeks }} minggu</span>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-4 border border-gray-100 dark:border-gray-800">
+                            <span class="text-[10px] text-gray-400 uppercase font-semibold">Tenggat Minggu Ini</span>
+                            <div class="font-extrabold text-lg text-gray-900 dark:text-white mt-1">
+                                {{ $customer->current_week_deadline ? $customer->current_week_deadline->format('d M Y') : '-' }}
+                            </div>
+                            <span class="text-[10px] text-gray-500">Batas setoran mingguan</span>
+                        </div>
+                    </div>
+
+                    @if ($customer->weekly_status === 'Menunggak')
+                        <div class="mt-6 p-4 rounded-xl bg-rose-50/50 dark:bg-rose-950/10 border border-rose-100/50 dark:border-rose-900/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div>
+                                <h4 class="text-sm font-bold text-rose-700 dark:text-rose-450">Anda Memiliki Tunggakan Tabungan</h4>
+                                <p class="text-xs text-rose-600 dark:text-rose-400 mt-0.5">Segera lakukan transfer untuk menyamakan kewajiban tabungan minggu ini.</p>
+                            </div>
+                            <div class="text-right sm:text-left">
+                                <span class="text-[10px] text-rose-500 uppercase font-semibold block">Total Tunggakan</span>
+                                <span class="font-black text-lg text-rose-700 dark:text-rose-400">Rp {{ number_format($customer->arrears_amount, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Kalender Cicilan Card -->
+                <div class="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-900 dark:text-white">Kalender Cicilan</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $customer->duration_weeks }} minggu cicilan</p>
+                        </div>
+                        
+                        <!-- Legenda -->
+                        <div class="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-semibold text-gray-600 dark:text-gray-400">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded bg-gray-100 dark:bg-gray-800 border border-gray-250 dark:border-gray-700"></div>
+                                <span>Belum Bayar</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded bg-amber-500 shadow-xs shadow-amber-500/20"></div>
+                                <span>Bukti Dikirim</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded bg-emerald-500 shadow-xs shadow-emerald-500/20"></div>
+                                <span>Diverifikasi</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded bg-rose-500 shadow-xs shadow-rose-500/20"></div>
+                                <span>Terlambat</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weeks Grid -->
+                    <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
+                        @foreach ($customer->getInstallmentCalendar() as $week)
+                            @php
+                                $statusClass = '';
+                                if ($week['status'] === 'verified') {
+                                    $statusClass = 'bg-emerald-500 text-white shadow-md shadow-emerald-500/10 border-emerald-600';
+                                } elseif ($week['status'] === 'pending') {
+                                    $statusClass = 'bg-amber-500 text-white shadow-md shadow-amber-500/10 border-amber-600';
+                                } elseif ($week['status'] === 'late') {
+                                    $statusClass = 'bg-rose-500 text-white shadow-md shadow-rose-500/10 border-rose-600';
+                                } else {
+                                    $statusClass = 'bg-gray-50 dark:bg-gray-850/40 text-gray-400 dark:text-gray-500 border-gray-150 dark:border-gray-800';
+                                }
+                            @endphp
+                            <div class="aspect-square flex flex-col items-center justify-center rounded-xl border font-bold text-xs transition duration-200 cursor-help {{ $statusClass }}" 
+                                 title="Minggu {{ $week['number'] }} • Tenggat: {{ $week['deadline'] ? $week['deadline']->format('d M Y') : '-' }} • Status: {{ ucfirst($week['status']) }}">
+                                <span>{{ $week['number'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
                 <!-- Progress Card -->
                 <div class="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
                     <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-6">Progres Cicilan Paket</h3>
@@ -70,14 +169,14 @@
                 <!-- Package Info Card -->
                 <div class="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
                     <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-4">Informasi Paket Lebaran</h3>
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-extrabold text-xl">
-                            LS
+                    <div class="flex flex-col sm:flex-row items-start gap-5">
+                        <div class="w-full sm:w-32 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-150 dark:border-gray-800 shrink-0">
+                            <img src="{{ $customer->package->imageUrl() }}" alt="{{ $customer->package->name }}" class="w-full h-full object-cover">
                         </div>
-                        <div>
+                        <div class="flex-1">
                             <h4 class="font-bold text-lg text-gray-900 dark:text-white">{{ $customer->package->name }}</h4>
-                            <p class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">Rp {{ number_format($customer->package->price, 0, ',', '.') }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-3 leading-relaxed">
+                            <p class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">Rp {{ number_format($customer->package->price, 0, ',', '.') }}</p>
+                            <p class="text-sm text-gray-605 dark:text-gray-400 mt-3 leading-relaxed">
                                 {{ $customer->package->description ?: 'Tidak ada rincian tambahan untuk paket ini.' }}
                             </p>
                         </div>

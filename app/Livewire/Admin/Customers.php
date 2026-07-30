@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Package;
 use App\Models\User;
 use App\Models\Payment;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -24,6 +25,8 @@ class Customers extends Component
     public $address = '';
     public $package_id = '';
     public $password = '';
+    public $start_date = '';
+    public $duration_weeks = 40;
 
     // Modal controls
     public $isOpen = false;
@@ -47,6 +50,8 @@ class Customers extends Component
             'address' => 'nullable|string',
             'package_id' => 'required|exists:packages,id',
             'password' => $this->isEditing ? 'nullable|min:6' : 'required|min:6',
+            'start_date' => 'required|date',
+            'duration_weeks' => 'required|integer|min:1',
         ];
     }
 
@@ -58,6 +63,16 @@ class Customers extends Component
     public function updatingFilterPackageId()
     {
         $this->resetPage();
+    }
+
+    public function updatedPackageId($value)
+    {
+        if ($value) {
+            $package = Package::find($value);
+            if ($package) {
+                $this->duration_weeks = $package->duration_weeks;
+            }
+        }
     }
 
     #[On('open-customer-modal-event')]
@@ -80,6 +95,8 @@ class Customers extends Component
         $this->address = '';
         $this->package_id = '';
         $this->password = '';
+        $this->start_date = Carbon::today()->format('Y-m-d');
+        $this->duration_weeks = 40;
         $this->isEditing = false;
         $this->editingId = null;
     }
@@ -94,6 +111,8 @@ class Customers extends Component
             'phone_number' => $this->phone_number,
             'address' => $this->address,
             'package_id' => $this->package_id,
+            'start_date' => $this->start_date,
+            'duration_weeks' => $this->duration_weeks,
             'role' => 'customer',
         ];
 
@@ -121,6 +140,8 @@ class Customers extends Component
         $this->phone_number = $customer->phone_number;
         $this->address = $customer->address;
         $this->package_id = $customer->package_id;
+        $this->start_date = $customer->start_date ? $customer->start_date->format('Y-m-d') : Carbon::today()->format('Y-m-d');
+        $this->duration_weeks = $customer->duration_weeks ?: 40;
         $this->password = ''; // leave blank for editing
         $this->isEditing = true;
         $this->isOpen = true;

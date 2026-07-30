@@ -34,50 +34,58 @@
     <!-- Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse ($packagesList as $pkg)
-            <div class="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl p-6 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
-                <!-- Status Badge Absolute -->
-                <div class="absolute top-6 right-6">
-                    <button wire:click="toggleStatus({{ $pkg->id }})" class="focus:outline-none transition transform active:scale-95">
-                        @if ($pkg->status === 'active')
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">Aktif</span>
-                        @else
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700">Tidak Aktif</span>
-                        @endif
-                    </button>
+            <div class="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
+                <!-- Image Header -->
+                <div class="h-44 w-full overflow-hidden relative bg-gray-100 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-800/50">
+                    <img src="{{ $pkg->imageUrl() }}" alt="{{ $pkg->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    
+                    <!-- Overlay Gradient -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                    
+                    <!-- Status Badge -->
+                    <div class="absolute top-4 right-4">
+                        <button wire:click="toggleStatus({{ $pkg->id }})" class="focus:outline-none transition transform active:scale-95">
+                            @if ($pkg->status === 'active')
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/90 text-white backdrop-blur-xs shadow-md shadow-emerald-500/20">Aktif</span>
+                            @else
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-900/80 text-gray-200 backdrop-blur-xs shadow-md">Tidak Aktif</span>
+                            @endif
+                        </button>
+                    </div>
                 </div>
 
-                <div>
-                    <!-- Package Icon / Initial -->
-                    <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-extrabold text-lg mb-4 group-hover:scale-110 transition duration-300">
-                        {{ substr($pkg->name, 0, 1) }}
+                <div class="p-6 flex flex-col justify-between flex-1">
+                    <div>
+                        <!-- Title & Price -->
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
+                            {{ $pkg->name }}
+                        </h3>
+                        <p class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400 mb-0.5">
+                            Rp {{ number_format($pkg->price, 0, ',', '.') }}
+                        </p>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold mb-4">
+                            Cicilan: <span class="text-indigo-600 dark:text-indigo-400 font-bold">Rp {{ number_format($pkg->weekly_installment, 0, ',', '.') }}</span> / minggu ({{ $pkg->duration_weeks }} minggu)
+                        </p>
+
+                        <!-- Description -->
+                        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-6 leading-relaxed">
+                            {{ $pkg->description ?: 'Tidak ada deskripsi paket.' }}
+                        </p>
                     </div>
 
-                    <!-- Title & Price -->
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
-                        {{ $pkg->name }}
-                    </h3>
-                    <p class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 mb-4">
-                        Rp {{ number_format($pkg->price, 0, ',', '.') }}
-                    </p>
-
-                    <!-- Description -->
-                    <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-4 mb-6 leading-relaxed">
-                        {{ $pkg->description ?: 'Tidak ada deskripsi paket.' }}
-                    </p>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="border-t border-gray-100 dark:border-gray-800 pt-4 mt-auto flex items-center justify-end gap-2">
-                    <button wire:click="edit({{ $pkg->id }})" class="p-2 text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition" title="Edit Paket">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                        </svg>
-                    </button>
-                    <button onclick="confirm('Apakah Anda yakin ingin menghapus paket ini?') || event.stopImmediatePropagation()" wire:click="delete({{ $pkg->id }})" class="p-2 text-gray-600 hover:text-rose-600 dark:text-gray-400 dark:hover:text-rose-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition" title="Hapus Paket">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                        </svg>
-                    </button>
+                    <!-- Action Buttons -->
+                    <div class="border-t border-gray-100 dark:border-gray-800 pt-4 mt-auto flex items-center justify-end gap-2">
+                        <button wire:click="edit({{ $pkg->id }})" class="p-2 text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition" title="Edit Paket">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                        </button>
+                        <button onclick="confirm('Apakah Anda yakin ingin menghapus paket ini?') || event.stopImmediatePropagation()" wire:click="delete({{ $pkg->id }})" class="p-2 text-gray-600 hover:text-rose-600 dark:text-gray-400 dark:hover:text-rose-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition" title="Hapus Paket">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         @empty
@@ -123,6 +131,12 @@
                     </div>
 
                     <div>
+                        <label for="duration_weeks" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Durasi Cicilan (Minggu)</label>
+                        <input wire:model="duration_weeks" type="number" id="duration_weeks" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Contoh: 40" required>
+                        @error('duration_weeks') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
                         <label for="description" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Deskripsi Paket</label>
                         <textarea wire:model="description" id="description" rows="4" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Rincian isi paket Lebaran..."></textarea>
                         @error('description') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
@@ -135,6 +149,32 @@
                             <option value="inactive">Tidak Aktif</option>
                         </select>
                         @error('status') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Gambar Paket</label>
+                        <div class="mt-1 flex items-center gap-4">
+                            @if ($image)
+                                <img src="{{ $image->temporaryUrl() }}" class="w-16 h-16 rounded-xl object-cover border border-gray-200 dark:border-gray-700">
+                            @elseif ($existingImage)
+                                <img src="{{ asset('storage/' . $existingImage) }}" class="w-16 h-16 rounded-xl object-cover border border-gray-200 dark:border-gray-700">
+                            @else
+                                <div class="w-16 h-16 rounded-xl bg-gray-50 dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-400">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    </svg>
+                                </div>
+                            @endif
+                            
+                            <div class="flex-1">
+                                <input type="file" wire:model="image" id="package_image" class="hidden">
+                                <label for="package_image" class="px-4 py-2 border border-gray-350 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer inline-block">
+                                    Pilih Gambar
+                                </label>
+                                <p class="text-[10px] text-gray-500 mt-1">PNG, JPG, JPEG, WebP maksimal 2MB</p>
+                            </div>
+                        </div>
+                        @error('image') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100 dark:border-gray-800 mt-6">

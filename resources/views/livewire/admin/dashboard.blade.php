@@ -1,13 +1,8 @@
 <div>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Admin Dashboard') }}
-            </h2>
-            <span class="text-xs text-gray-500 font-medium dark:text-gray-400">
-                Data diperbarui: {{ now()->translatedFormat('d F Y, H:i') }} WIB
-            </span>
-        </div>
+        <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Admin Dashboard') }}
+        </h2>
     </x-slot>
 
     <!-- Stats Grid -->

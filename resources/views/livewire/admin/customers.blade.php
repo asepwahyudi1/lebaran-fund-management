@@ -76,19 +76,20 @@
                                 <div class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 max-w-[200px]">{{ $c->address ?? '-' }}</div>
                             </td>
                             <td class="py-4 px-6">
-                                @if ($c->package)
-                                    <span class="px-2.5 py-1 text-xs font-semibold bg-indigo-50 text-indigo-600 dark:bg-indigo-950/20 dark:text-indigo-400 rounded-lg">
-                                        {{ $c->package->name }}
-                                    </span>
-                                    <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-1">
-                                        Harga: Rp {{ number_format($c->package->price, 0, ',', '.') }}
+                                @if ($c->packages->isNotEmpty())
+                                    <div class="flex flex-col gap-1 items-start">
+                                        @foreach ($c->packages as $pkg)
+                                            <span class="inline-block px-2.5 py-0.5 text-[11px] font-semibold bg-indigo-50 text-indigo-600 dark:bg-indigo-950/20 dark:text-indigo-400 rounded-md max-w-fit">
+                                                {{ $pkg->name }}
+                                            </span>
+                                        @endforeach
                                     </div>
                                 @else
                                     <span class="text-xs text-gray-400 dark:text-gray-500">Belum memilih paket</span>
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-center">
-                                @if ($c->package)
+                                @if ($c->packages->isNotEmpty())
                                     <div class="flex flex-col items-center gap-1">
                                         @if ($c->weekly_status === 'Lancar')
                                             <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-md dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">Lancar</span>
@@ -188,27 +189,25 @@
                     </div>
 
                     <div>
-                        <label for="package_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Paket Lebaran Terpilih</label>
-                        <select wire:model="package_id" id="package_id" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                            <option value="">-- Pilih Paket --</option>
+                        <span class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Pilih Paket Lebaran (Bisa lebih dari 1)</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-800/50">
                             @foreach ($packages as $pkg)
-                                <option value="{{ $pkg->id }}">{{ $pkg->name }} (Rp {{ number_format($pkg->price, 0, ',', '.') }})</option>
+                                <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white dark:hover:bg-gray-800 cursor-pointer transition">
+                                    <input type="checkbox" wire:model="package_ids" value="{{ $pkg->id }}" class="rounded text-indigo-600 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 dark:bg-gray-900">
+                                    <div class="text-sm">
+                                        <p class="font-semibold text-gray-900 dark:text-white">{{ $pkg->name }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Rp {{ number_format($pkg->price / ($pkg->duration_weeks ?: 40), 0, ',', '.') }}/mgg ({{ $pkg->duration_weeks }} mgg)</p>
+                                    </div>
+                                </label>
                             @endforeach
-                        </select>
-                        @error('package_id') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+                        @error('package_ids') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label for="start_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tanggal Mulai Menabung</label>
-                            <input wire:model="start_date" type="date" id="start_date" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
-                            @error('start_date') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-                        <div>
-                            <label for="duration_weeks" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Durasi Cicilan (Minggu)</label>
-                            <input wire:model="duration_weeks" type="number" id="duration_weeks" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Contoh: 40" required>
-                            @error('duration_weeks') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
-                        </div>
+                    <div>
+                        <label for="start_date" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tanggal Mulai Menabung</label>
+                        <input wire:model="start_date" type="date" id="start_date" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        @error('start_date') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
@@ -265,24 +264,38 @@
                         </div>
                         <div>
                             <span class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold">Data Paket Terpilih</span>
-                            <h4 class="font-bold text-lg text-indigo-600 dark:text-indigo-400 mt-1">{{ $detailCustomer->package->name ?? 'Belum memilih paket' }}</h4>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Harga Paket: Rp {{ number_format($detailCustomer->package->price ?? 0, 0, ',', '.') }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{{ $detailCustomer->package->description ?? '' }}</p>
+                            @if ($detailCustomer->packages->isNotEmpty())
+                                <div class="flex flex-col gap-2 mt-1">
+                                    @foreach ($detailCustomer->packages as $pkg)
+                                        <div class="border-b border-gray-55 dark:border-gray-800 last:border-0 pb-1.5 last:pb-0">
+                                            <h4 class="font-bold text-sm text-indigo-600 dark:text-indigo-400">{{ $pkg->name }}</h4>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400">Harga: Rp {{ number_format($pkg->price, 0, ',', '.') }} (Rp {{ number_format($pkg->price / ($pkg->duration_weeks ?: 40), 0, ',', '.') }}/mgg)</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <h4 class="font-bold text-sm text-gray-400 mt-1">Belum memilih paket</h4>
+                            @endif
                         </div>
                     </div>
 
                     <!-- Weekly Installment Plan -->
-                    @if ($detailCustomer->package)
+                    @if ($detailCustomer->packages->isNotEmpty())
+                        @php
+                            $calendar = $detailCustomer->getInstallmentCalendar();
+                            $currentWeekIdx = $detailCustomer->current_week - 1;
+                            $currentWeeklyAmt = isset($calendar[$currentWeekIdx]) ? $calendar[$currentWeekIdx]['expected_amount'] : ($detailCustomer->packages->sum(fn($p) => $p->price / ($p->duration_weeks ?: 40)));
+                        @endphp
                         <div class="mb-6 p-4 rounded-xl border {{ $detailCustomer->weekly_status === 'Lancar' ? 'bg-emerald-50/30 border-emerald-100 dark:bg-emerald-950/5 dark:border-emerald-900/20' : 'bg-rose-50/30 border-rose-100 dark:bg-rose-950/5 dark:border-rose-900/20' }}">
                             <h4 class="font-bold text-xs uppercase tracking-wider text-gray-500 mb-3">Status Cicilan Mingguan</h4>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <span class="text-xs text-gray-400">Minggu Berjalan:</span>
-                                    <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Minggu ke-{{ $detailCustomer->current_week }} dari {{ $detailCustomer->package->duration_weeks }} mgg</div>
+                                    <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Minggu ke-{{ $detailCustomer->current_week }} dari {{ count($calendar) }} mgg</div>
                                 </div>
                                 <div>
                                     <span class="text-xs text-gray-400">Cicilan Mingguan:</span>
-                                    <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Rp {{ number_format($detailCustomer->package->weekly_installment, 0, ',', '.') }} / mgg</div>
+                                    <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Rp {{ number_format($currentWeeklyAmt, 0, ',', '.') }} / mgg</div>
                                 </div>
                                 <div>
                                     <span class="text-xs text-gray-400">Status Tabungan:</span>
@@ -316,7 +329,7 @@
                             <span class="text-gray-700 dark:text-gray-300">Progress Pembayaran</span>
                             <span class="text-indigo-600 dark:text-indigo-400">
                                 @php
-                                    $pkgPrice = $detailCustomer->package->price ?? 0;
+                                    $pkgPrice = $detailCustomer->packages->sum('price') ?? 0;
                                     $percent = $pkgPrice > 0 ? min(100, round(($totalPaid / $pkgPrice) * 100)) : 0;
                                 @endphp
                                 {{ $percent }}% Terbayar
@@ -346,12 +359,12 @@
                     </div>
 
                     <!-- Kalender Cicilan -->
-                    @if ($detailCustomer && $detailCustomer->package)
+                    @if ($detailCustomer && $detailCustomer->packages->isNotEmpty())
                         <div class="mb-8 p-4 rounded-xl border border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs">
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                                 <div>
                                     <h4 class="font-bold text-xs uppercase tracking-wider text-gray-500">Kalender Cicilan</h4>
-                                    <p class="text-[10px] text-gray-400 mt-0.5">{{ $detailCustomer->duration_weeks }} minggu cicilan</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">{{ count($detailCustomer->getInstallmentCalendar()) }} minggu cicilan</p>
                                 </div>
                                 
                                 <!-- Legenda -->
@@ -391,7 +404,7 @@
                                         }
                                     @endphp
                                     <div class="aspect-square flex flex-col items-center justify-center rounded-lg border font-bold text-[10px] transition duration-200 cursor-help {{ $statusClass }}" 
-                                         title="Minggu {{ $week['number'] }} • Tenggat: {{ $week['deadline'] ? $week['deadline']->format('d M Y') : '-' }} • Status: {{ ucfirst($week['status']) }}">
+                                         title="Minggu {{ $week['number'] }} • Tenggat: {{ $week['deadline'] ? $week['deadline']->format('d M Y') : '-' }} • Status: {{ ucfirst($week['status']) }} • Dibayar: Rp {{ number_format($week['paid_amount'] + $week['pending_amount'], 0, ',', '.') }} @if($week['pending_amount'] > 0)(Rp {{ number_format($week['paid_amount'], 0, ',', '.') }} Lunas, Rp {{ number_format($week['pending_amount'], 0, ',', '.') }} Pending)@endif • Target: Rp {{ number_format($week['expected_amount'], 0, ',', '.') }}">
                                         <span>{{ $week['number'] }}</span>
                                     </div>
                                 @endforeach

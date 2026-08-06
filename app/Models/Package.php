@@ -13,7 +13,9 @@ class Package extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class)
+            ->withPivot('start_date', 'duration_weeks')
+            ->withTimestamps();
     }
 
     public function getWeeklyInstallmentAttribute(): float

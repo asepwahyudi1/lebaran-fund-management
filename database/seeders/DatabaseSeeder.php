@@ -59,8 +59,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'customer',
             'phone_number' => '085711122233',
             'address' => 'Jl. Raya Bojong Gede No. 45, Bogor',
-            'package_id' => $packageA->id,
-            'start_date' => now()->subWeeks(3),
+        ]);
+        $customerA->packages()->attach($packageA->id, [
+            'start_date' => now()->subWeeks(3)->format('Y-m-d'),
             'duration_weeks' => 40,
         ]);
 
@@ -71,8 +72,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'customer',
             'phone_number' => '081988877766',
             'address' => 'Perum Sari Gading Blok C4, Depok',
-            'package_id' => $packageB->id,
-            'start_date' => now()->subWeeks(10),
+        ]);
+        $customerB->packages()->attach($packageB->id, [
+            'start_date' => now()->subWeeks(10)->format('Y-m-d'),
             'duration_weeks' => 40,
         ]);
 
@@ -83,8 +85,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'customer',
             'phone_number' => '081299988877',
             'address' => 'Kampung Baru RT 03/05, Citayam',
-            'package_id' => $packageC->id,
-            'start_date' => now(),
+        ]);
+        $customerC->packages()->attach($packageC->id, [
+            'start_date' => now()->format('Y-m-d'),
             'duration_weeks' => 40,
         ]);
 
@@ -95,8 +98,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'customer',
             'phone_number' => '087812345678',
             'address' => 'Jl. Kenanga No. 12, Cibinong',
-            'package_id' => $packageA->id,
-            'start_date' => now()->subWeeks(5),
+        ]);
+        $customerD->packages()->attach($packageA->id, [
+            'start_date' => now()->subWeeks(5)->format('Y-m-d'),
             'duration_weeks' => 40,
         ]);
 

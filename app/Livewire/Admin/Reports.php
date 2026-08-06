@@ -21,8 +21,8 @@ class Reports extends Component
         }])->get()->map(function ($package) {
             // Get all verified payments for customers in this package
             $verifiedAmount = Payment::where('status', 'verified')
-                ->whereHas('user', function ($q) use ($package) {
-                    $q->where('package_id', $package->id)->where('role', 'customer');
+                ->whereHas('user.packages', function ($q) use ($package) {
+                    $q->where('packages.id', $package->id);
                 })->sum('amount');
 
             // Total potential collection = (price * customer count)
@@ -41,7 +41,7 @@ class Reports extends Component
         });
 
         // 3. Transactions recap list
-        $recentTransactions = Payment::with('user.package')
+        $recentTransactions = Payment::with('user.packages')
             ->where('status', 'verified')
             ->orderBy('payment_date', 'desc')
             ->take(20)

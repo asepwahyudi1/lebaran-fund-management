@@ -9,13 +9,14 @@ class Dashboard extends Component
 {
     public function render()
     {
-        $customer = auth()->user()->load('package');
+        $customer = auth()->user()->load('packages');
+        $customer->checkDueNotifications();
         
         $totalPaid = Payment::where('user_id', $customer->id)
             ->where('status', 'verified')
             ->sum('amount');
 
-        $packagePrice = $customer->package->price ?? 0;
+        $packagePrice = $customer->packages->sum('price');
         $remainingBalance = max(0, $packagePrice - $totalPaid);
         
         $progressPercent = $packagePrice > 0 ? min(100, round(($totalPaid / $packagePrice) * 100)) : 0;

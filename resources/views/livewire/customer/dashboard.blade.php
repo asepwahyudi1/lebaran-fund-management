@@ -23,12 +23,18 @@
         <span class="text-xs font-bold bg-white/20 text-white px-3 py-1 rounded-full uppercase tracking-wider">Selamat Datang</span>
         <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mt-3 mb-2">Halo, {{ $customer->name }}!</h1>
         <p class="text-sm text-indigo-100 max-w-xl leading-relaxed">
-            Terima kasih telah menabung di UMKM Sumber Sari. Anda terdaftar pada **{{ $customer->package->name ?? 'Belum Memilih Paket' }}**. 
+            Terima kasih telah menabung di UMKM Sumber Sari. Anda terdaftar pada **{{ $customer->packages->isNotEmpty() ? $customer->packages->pluck('name')->implode(', ') : 'Belum Memilih Paket' }}**. 
             Pantau terus progres cicilan Anda di bawah ini menuju Lebaran yang penuh berkah.
         </p>
     </div>
 
-    @if ($customer->package)
+    @if ($customer->packages->isNotEmpty())
+        @php
+            $calendar = $customer->getInstallmentCalendar();
+            $currentWeekIdx = $customer->current_week - 1;
+            $currentWeeklyAmt = isset($calendar[$currentWeekIdx]) ? $calendar[$currentWeekIdx]['expected_amount'] : ($customer->packages->sum(fn($p) => $p->price / ($p->pivot->duration_weeks ?: 40)));
+            $totalCalendarWeeks = count($calendar);
+        @endphp
         <!-- Dashboard Content Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left 2 Cols: Progress and Info -->
@@ -47,14 +53,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-4 border border-gray-100 dark:border-gray-800">
                             <span class="text-[10px] text-gray-400 uppercase font-semibold">Cicilan Mingguan</span>
-                            <div class="font-extrabold text-lg text-gray-900 dark:text-white mt-1">Rp {{ number_format($customer->package->weekly_installment, 0, ',', '.') }}</div>
+                            <div class="font-extrabold text-lg text-gray-900 dark:text-white mt-1">Rp {{ number_format($currentWeeklyAmt, 0, ',', '.') }}</div>
                             <span class="text-[10px] text-gray-500">per minggu</span>
                         </div>
                         
                         <div class="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-4 border border-gray-100 dark:border-gray-800">
                             <span class="text-[10px] text-gray-400 uppercase font-semibold">Minggu Berjalan</span>
                             <div class="font-extrabold text-lg text-gray-900 dark:text-white mt-1">Minggu ke-{{ $customer->current_week }}</div>
-                            <span class="text-[10px] text-gray-500">dari {{ $customer->package->duration_weeks }} minggu</span>
+                            <span class="text-[10px] text-gray-500">dari {{ $totalCalendarWeeks }} minggu</span>
                         </div>
                         
                         <div class="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-4 border border-gray-100 dark:border-gray-800">
@@ -125,7 +131,7 @@
                                 }
                             @endphp
                             <div class="aspect-square flex flex-col items-center justify-center rounded-xl border font-bold text-xs transition duration-200 cursor-help {{ $statusClass }}" 
-                                 title="Minggu {{ $week['number'] }} • Tenggat: {{ $week['deadline'] ? $week['deadline']->format('d M Y') : '-' }} • Status: {{ ucfirst($week['status']) }}">
+                                 title="Minggu {{ $week['number'] }} • Tenggat: {{ $week['deadline'] ? $week['deadline']->format('d M Y') : '-' }} • Status: {{ ucfirst($week['status']) }} • Dibayar: Rp {{ number_format($week['paid_amount'] + $week['pending_amount'], 0, ',', '.') }} @if($week['pending_amount'] > 0)(Rp {{ number_format($week['paid_amount'], 0, ',', '.') }} Lunas, Rp {{ number_format($week['pending_amount'], 0, ',', '.') }} Pending)@endif • Target: Rp {{ number_format($week['expected_amount'], 0, ',', '.') }}">
                                 <span>{{ $week['number'] }}</span>
                             </div>
                         @endforeach
@@ -147,7 +153,7 @@
                                 <div class="bg-gradient-to-r from-indigo-500 to-violet-600 h-4 rounded-full transition-all duration-700" style="width: {{ $progressPercent }}%"></div>
                             </div>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
-                                Berhasil mengumpulkan <strong class="text-gray-800 dark:text-gray-200">Rp {{ number_format($totalPaid, 0, ',', '.') }}</strong> dari total target <strong class="text-gray-800 dark:text-gray-200">Rp {{ number_format($customer->package->price, 0, ',', '.') }}</strong>.
+                                Berhasil mengumpulkan <strong class="text-gray-800 dark:text-gray-200">Rp {{ number_format($totalPaid, 0, ',', '.') }}</strong> dari total target <strong class="text-gray-800 dark:text-gray-200">Rp {{ number_format($customer->packages->sum('price'), 0, ',', '.') }}</strong>.
                             </p>
                         </div>
                     </div>
@@ -169,17 +175,21 @@
                 <!-- Package Info Card -->
                 <div class="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
                     <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-4">Informasi Paket Lebaran</h3>
-                    <div class="flex flex-col sm:flex-row items-start gap-5">
-                        <div class="w-full sm:w-32 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-150 dark:border-gray-800 shrink-0">
-                            <img src="{{ $customer->package->imageUrl() }}" alt="{{ $customer->package->name }}" class="w-full h-full object-cover">
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-lg text-gray-900 dark:text-white">{{ $customer->package->name }}</h4>
-                            <p class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">Rp {{ number_format($customer->package->price, 0, ',', '.') }}</p>
-                            <p class="text-sm text-gray-605 dark:text-gray-400 mt-3 leading-relaxed">
-                                {{ $customer->package->description ?: 'Tidak ada rincian tambahan untuk paket ini.' }}
-                            </p>
-                        </div>
+                    <div class="space-y-4">
+                        @foreach ($customer->packages as $pkg)
+                            <div class="flex flex-col sm:flex-row items-start gap-4 pb-4 last:pb-0 border-b last:border-0 border-gray-100 dark:border-gray-800">
+                                <div class="w-full sm:w-24 h-16 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-150 dark:border-gray-800 shrink-0">
+                                    <img src="{{ $pkg->imageUrl() }}" alt="{{ $pkg->name }}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-base text-gray-900 dark:text-white">{{ $pkg->name }}</h4>
+                                    <p class="text-xs font-semibold text-gray-450 dark:text-gray-400">Setoran: Rp {{ number_format($pkg->price / ($pkg->duration_weeks ?: 40), 0, ',', '.') }} / mgg</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                        {{ $pkg->description ?: 'Tidak ada rincian tambahan untuk paket ini.' }}
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -248,7 +258,13 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
             </svg>
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Akun Anda Belum Memiliki Paket Aktif</h3>
-            <p class="text-sm max-w-md mx-auto">Silakan hubungi Admin Sumber Sari untuk mendaftarkan akun Anda pada salah satu paket Lebaran yang tersedia.</p>
+            <p class="text-sm max-w-md mx-auto mb-6">Silakan pilih salah satu paket Lebaran yang tersedia di katalog kami untuk memulai tabungan Anda.</p>
+            <a href="{{ route('customer.catalog') }}" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow-md transition duration-200 inline-flex items-center gap-2" wire:navigate>
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                Lihat Katalog Paket
+            </a>
         </div>
     @endif
 </div>

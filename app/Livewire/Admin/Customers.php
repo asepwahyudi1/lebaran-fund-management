@@ -23,10 +23,9 @@ class Customers extends Component
     public $email = '';
     public $phone_number = '';
     public $address = '';
-    public $package_id = '';
+    public $package_ids = [];
     public $password = '';
     public $start_date = '';
-    public $duration_weeks = 40;
 
     // Modal controls
     public $isOpen = false;
@@ -48,10 +47,10 @@ class Customers extends Component
             'email' => 'required|email|max:255|unique:users,email,' . $this->editingId,
             'phone_number' => 'nullable|string|max:20|unique:users,phone_number,' . $this->editingId,
             'address' => 'nullable|string',
-            'package_id' => 'required|exists:packages,id',
+            'package_ids' => 'nullable|array',
+            'package_ids.*' => 'exists:packages,id',
             'password' => $this->isEditing ? 'nullable|min:6' : 'required|min:6',
-            'start_date' => 'required|date',
-            'duration_weeks' => 'required|integer|min:1',
+            'start_date' => 'nullable|date',
         ];
     }
 
@@ -63,16 +62,6 @@ class Customers extends Component
     public function updatingFilterPackageId()
     {
         $this->resetPage();
-    }
-
-    public function updatedPackageId($value)
-    {
-        if ($value) {
-            $package = Package::find($value);
-            if ($package) {
-                $this->duration_weeks = $package->duration_weeks;
-            }
-        }
     }
 
     #[On('open-customer-modal-event')]
@@ -93,10 +82,9 @@ class Customers extends Component
         $this->email = '';
         $this->phone_number = '';
         $this->address = '';
-        $this->package_id = '';
+        $this->package_ids = [];
         $this->password = '';
         $this->start_date = Carbon::today()->format('Y-m-d');
-        $this->duration_weeks = 40;
         $this->isEditing = false;
         $this->editingId = null;
     }
@@ -110,9 +98,6 @@ class Customers extends Component
             'email' => $this->email,
             'phone_number' => $this->phone_number,
             'address' => $this->address,
-            'package_id' => $this->package_id,
-            'start_date' => $this->start_date,
-            'duration_weeks' => $this->duration_weeks,
             'role' => 'customer',
         ];
 
@@ -120,10 +105,23 @@ class Customers extends Component
             $data['password'] = Hash::make($this->password);
         }
 
-        User::updateOrCreate(
+        $user = User::updateOrCreate(
             ['id' => $this->editingId],
             $data
         );
+
+        // Sync packages in pivot table
+        $syncData = [];
+        foreach ($this->package_ids ?? [] as $pid) {
+            $package = Package::find($pid);
+            if ($package) {
+                $syncData[$pid] = [
+                    'start_date' => $this->start_date ?: Carbon::today()->format('Y-m-d'),
+                    'duration_weeks' => $package->duration_weeks ?: 40,
+                ];
+            }
+        }
+        $user->packages()->sync($syncData);
 
         session()->flash('message', $this->isEditing ? 'Pelanggan berhasil diperbarui.' : 'Pelanggan berhasil ditambahkan.');
         
@@ -139,9 +137,8 @@ class Customers extends Component
         $this->email = $customer->email;
         $this->phone_number = $customer->phone_number;
         $this->address = $customer->address;
-        $this->package_id = $customer->package_id;
-        $this->start_date = $customer->start_date ? $customer->start_date->format('Y-m-d') : Carbon::today()->format('Y-m-d');
-        $this->duration_weeks = $customer->duration_weeks ?: 40;
+        $this->package_ids = $customer->packages()->pluck('packages.id')->toArray();
+        $this->start_date = $customer->getEarliestStartDate() ? $customer->getEarliestStartDate()->format('Y-m-d') : Carbon::today()->format('Y-m-d');
         $this->password = ''; // leave blank for editing
         $this->isEditing = true;
         $this->isOpen = true;
@@ -157,7 +154,7 @@ class Customers extends Component
     public function showDetail($id)
     {
         $this->detailCustomerId = $id;
-        $this->detailCustomer = User::with('package')->findOrFail($id);
+        $this->detailCustomer = User::with('packages')->findOrFail($id);
         
         // Fetch all verified payments for calculations
         $this->detailPayments = Payment::where('user_id', $id)
@@ -168,7 +165,7 @@ class Customers extends Component
             ->where('status', 'verified')
             ->sum('amount');
 
-        $packagePrice = $this->detailCustomer->package->price ?? 0;
+        $packagePrice = $this->detailCustomer->packages->sum('price') ?? 0;
         $this->remainingBalance = max(0, $packagePrice - $this->totalPaid);
 
         $this->isOpenDetail = true;
@@ -183,7 +180,7 @@ class Customers extends Component
 
     public function render()
     {
-        $query = User::where('role', 'customer')->with('package');
+        $query = User::where('role', 'customer')->with('packages');
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -193,7 +190,9 @@ class Customers extends Component
         }
 
         if ($this->filterPackageId) {
-            $query->where('package_id', $this->filterPackageId);
+            $query->whereHas('packages', function ($q) {
+                $q->where('packages.id', $this->filterPackageId);
+            });
         }
 
         return view('livewire.admin.customers', [

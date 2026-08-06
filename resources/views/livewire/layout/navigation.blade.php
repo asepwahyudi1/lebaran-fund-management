@@ -17,6 +17,11 @@ new class extends Component
 }; ?>
 
 <div class="flex items-center gap-4">
+    @if(auth()->user()->isCustomer())
+        <livewire:layout.cart-badge />
+        <livewire:layout.notification-dropdown />
+    @endif
+
     <!-- User Info and Avatar Dropdown -->
     <div class="relative" x-data="{ dropdownOpen: false }">
         <button @click="dropdownOpen = ! dropdownOpen" @click.outside="dropdownOpen = false" class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition focus:outline-none">

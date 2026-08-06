@@ -13,10 +13,18 @@ class ProfileTest extends TestCase
 
     public function test_profile_page_is_displayed(): void
     {
-        $user = User::factory()->create();
+        // 1. Customer should NOT see delete-user-form
+        $customer = User::factory()->create(['role' => 'customer']);
+        $response = $this->actingAs($customer)->get('/profile');
+        $response
+            ->assertOk()
+            ->assertSeeVolt('profile.update-profile-information-form')
+            ->assertSeeVolt('profile.update-password-form')
+            ->assertDontSeeVolt('profile.delete-user-form');
 
-        $response = $this->actingAs($user)->get('/profile');
-
+        // 2. Admin should see delete-user-form
+        $admin = User::factory()->create(['role' => 'admin']);
+        $response = $this->actingAs($admin)->get('/profile');
         $response
             ->assertOk()
             ->assertSeeVolt('profile.update-profile-information-form')

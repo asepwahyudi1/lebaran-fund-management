@@ -10,6 +10,9 @@ use App\Livewire\Admin\Reports as AdminReports;
 use App\Livewire\Customer\Dashboard as CustomerDashboard;
 use App\Livewire\Customer\UploadPayment as CustomerUploadPayment;
 use App\Livewire\Customer\PaymentHistory as CustomerPaymentHistory;
+use App\Livewire\Customer\Catalog as CustomerCatalog;
+use App\Livewire\Customer\MyPackage as CustomerMyPackage;
+use App\Livewire\Customer\Cart as CustomerCart;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -37,6 +40,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // Customer Routes
 Route::middleware(['auth', 'customer'])->prefix('customer')->name('customer.')->group(function () {
     Route::get('/dashboard', CustomerDashboard::class)->name('dashboard');
+    Route::get('/catalog', CustomerCatalog::class)->name('catalog');
+    Route::get('/my-package', CustomerMyPackage::class)->name('my-package');
+    Route::get('/cart', CustomerCart::class)->name('cart');
     Route::get('/upload-payment', CustomerUploadPayment::class)->name('upload-payment');
     Route::get('/payment-history', CustomerPaymentHistory::class)->name('payment-history');
 });

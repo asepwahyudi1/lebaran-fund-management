@@ -114,7 +114,7 @@
                     @forelse ($recentTransactions as $tx)
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/10 transition">
                             <td class="py-4 px-6 font-bold text-gray-900 dark:text-white">{{ $tx->user->name ?? 'User Terhapus' }}</td>
-                            <td class="py-4 px-6 text-gray-600 dark:text-gray-400">{{ $tx->user->package->name ?? '-' }}</td>
+                            <td class="py-4 px-6 text-gray-600 dark:text-gray-400">{{ $tx->user ? $tx->user->packages->pluck('name')->implode(', ') : '-' }}</td>
                             <td class="py-4 px-6 text-gray-700 dark:text-gray-300">{{ $tx->payment_date->format('d M Y') }}</td>
                             <td class="py-4 px-6 text-gray-700 dark:text-gray-300">{{ $tx->payment_method }}</td>
                             <td class="py-4 px-6 font-bold text-gray-900 dark:text-white">Rp {{ number_format($tx->amount, 0, ',', '.') }}</td>

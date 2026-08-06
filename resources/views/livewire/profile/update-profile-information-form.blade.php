@@ -10,14 +10,19 @@ new class extends Component
 {
     public string $name = '';
     public string $email = '';
+    public string $phone_number = '';
+    public string $address = '';
 
     /**
      * Mount the component.
      */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $user = Auth::user();
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->phone_number = $user->phone_number ?? '';
+        $this->address = $user->address ?? '';
     }
 
     /**
@@ -30,6 +35,8 @@ new class extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'phone_number' => ['nullable', 'string', 'max:20', Rule::unique(User::class)->ignore($user->id)],
+            'address' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $user->fill($validated);
@@ -102,6 +109,18 @@ new class extends Component
                     @endif
                 </div>
             @endif
+        </div>
+
+        <div>
+            <x-input-label for="phone_number" :value="__('No. Telepon')" />
+            <x-text-input wire:model="phone_number" id="phone_number" name="phone_number" type="text" class="mt-1 block w-full" autocomplete="tel" />
+            <x-input-error class="mt-2" :messages="$errors->get('phone_number')" />
+        </div>
+
+        <div>
+            <x-input-label for="address" :value="__('Alamat')" />
+            <textarea wire:model="address" id="address" name="address" rows="3" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"></textarea>
+            <x-input-error class="mt-2" :messages="$errors->get('address')" />
         </div>
 
         <div class="flex items-center gap-4">

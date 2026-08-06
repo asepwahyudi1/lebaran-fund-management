@@ -75,7 +75,7 @@ class Payments extends Component
             'payment_method' => 'required|string',
         ]);
 
-        Payment::create([
+        $payment = Payment::create([
             'user_id' => $this->user_id,
             'amount' => $this->amount,
             'payment_date' => $this->payment_date,
@@ -84,6 +84,14 @@ class Payments extends Component
             'verified_by' => auth()->id(),
             'verified_at' => now(),
             'admin_notes' => 'Diinput secara manual oleh Admin',
+        ]);
+
+        \App\Models\Notification::create([
+            'user_id' => $payment->user_id,
+            'title' => 'Pembayaran Dicatat Admin 💰',
+            'message' => 'Pembayaran setoran sebesar Rp ' . number_format($payment->amount, 0, ',', '.') . ' telah dicatat dan diverifikasi secara manual oleh Admin.',
+            'type' => 'payment_verified',
+            'is_read' => false,
         ]);
 
         session()->flash('message', 'Pembayaran manual berhasil dicatat.');
@@ -116,6 +124,14 @@ class Payments extends Component
         $payment->verified_at = now();
         $payment->save();
 
+        \App\Models\Notification::create([
+            'user_id' => $payment->user_id,
+            'title' => 'Bukti Transfer Terverifikasi! ✅',
+            'message' => 'Bukti transfer setoran sebesar Rp ' . number_format($payment->amount, 0, ',', '.') . ' telah berhasil diverifikasi oleh Admin.',
+            'type' => 'payment_verified',
+            'is_read' => false,
+        ]);
+
         session()->flash('message', 'Pembayaran berhasil diverifikasi.');
         $this->closeVerifyModal();
     }
@@ -135,6 +151,14 @@ class Payments extends Component
         $payment->verified_by = auth()->id();
         $payment->verified_at = now();
         $payment->save();
+
+        \App\Models\Notification::create([
+            'user_id' => $payment->user_id,
+            'title' => 'Bukti Transfer Ditolak ❌',
+            'message' => 'Bukti transfer setoran sebesar Rp ' . number_format($payment->amount, 0, ',', '.') . ' ditolak oleh Admin. Alasan: "' . $payment->admin_notes . '". Silakan periksa kembali bukti transfer Anda.',
+            'type' => 'payment_rejected',
+            'is_read' => false,
+        ]);
 
         session()->flash('message', 'Pembayaran ditolak.');
         $this->closeVerifyModal();

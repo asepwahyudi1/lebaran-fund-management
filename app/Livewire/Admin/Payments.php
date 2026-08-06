@@ -102,7 +102,7 @@ class Payments extends Component
     public function openVerifyModal($id)
     {
         $this->verifyingPaymentId = $id;
-        $this->verifyingPayment = Payment::with('user.package')->findOrFail($id);
+        $this->verifyingPayment = Payment::with('user.packages')->findOrFail($id);
         $this->admin_notes = $this->verifyingPayment->admin_notes ?? '';
         $this->isOpenVerify = true;
     }

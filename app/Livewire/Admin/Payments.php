@@ -166,7 +166,7 @@ class Payments extends Component
 
     public function render()
     {
-        $query = Payment::with('user.package');
+        $query = Payment::with('user.packages');
 
         if ($this->filterStatus) {
             $query->where('status', $this->filterStatus);

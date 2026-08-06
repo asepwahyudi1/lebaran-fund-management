@@ -62,7 +62,7 @@
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/10 transition">
                             <td class="py-4 px-6">
                                 <h4 class="font-bold text-sm text-gray-900 dark:text-white">{{ $pmt->user->name ?? 'Deleted User' }}</h4>
-                                <span class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">{{ $pmt->user->package->name ?? '-' }}</span>
+                                <span class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">{{ $pmt->user ? $pmt->user->packages->pluck('name')->implode(', ') ?: '-' : '-' }}</span>
                             </td>
                             <td class="py-4 px-6">
                                 <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $pmt->payment_date->format('d M Y') }}</div>
@@ -137,7 +137,7 @@
                         <select wire:model="user_id" id="user_id" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
                             <option value="">-- Pilih Pelanggan --</option>
                             @foreach ($customers as $c)
-                                <option value="{{ $c->id }}">{{ $c->name }} ({{ $c->package->name ?? 'Belum memilih paket' }})</option>
+                                <option value="{{ $c->id }}">{{ $c->name }} ({{ $c->packages->pluck('name')->implode(', ') ?: 'Belum memilih paket' }})</option>
                             @endforeach
                         </select>
                         @error('user_id') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
@@ -209,8 +209,8 @@
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $verifyingPayment->user->phone_number }}</p>
                                 
                                 <h4 class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mt-4">Paket Pilihan</h4>
-                                <p class="font-bold text-sm text-indigo-600 dark:text-indigo-400 mt-1">{{ $verifyingPayment->user->package->name ?? '-' }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Harga: Rp {{ number_format($verifyingPayment->user->package->price ?? 0, 0, ',', '.') }}</p>
+                                <p class="font-bold text-sm text-indigo-600 dark:text-indigo-400 mt-1">{{ $verifyingPayment->user ? $verifyingPayment->user->packages->pluck('name')->implode(', ') ?: '-' : '-' }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Total Harga: Rp {{ number_format($verifyingPayment->user ? $verifyingPayment->user->packages->sum('price') : 0, 0, ',', '.') }}</p>
                             </div>
 
                             <div class="bg-indigo-50/30 dark:bg-indigo-950/10 p-4 rounded-2xl border border-indigo-100/50 dark:border-indigo-900/20">

@@ -155,7 +155,7 @@
                         </div>
                         <div class="text-right">
                             <span class="px-2.5 py-1 text-xs font-semibold bg-indigo-50 text-indigo-600 dark:bg-indigo-950/20 dark:text-indigo-400 rounded-lg">
-                                {{ $customer->package->name ?? 'Tanpa Paket' }}
+                                {{ $customer->packages->pluck('name')->implode(', ') ?: 'Tanpa Paket' }}
                             </span>
                             <div class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
                                 Terdaftar {{ $customer->created_at->diffForHumans() }}

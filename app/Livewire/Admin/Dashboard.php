@@ -32,7 +32,7 @@ class Dashboard extends Component
 
         // Recent Customers
         $recentCustomers = User::where('role', 'customer')
-            ->with('package')
+            ->with('packages')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();

@@ -78,14 +78,14 @@
 
                     <!-- Action Button -->
                     @if ($enrolledCount > 0)
-                        <button wire:click="addToCart({{ $pkg->id }})" class="w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30 text-center font-bold text-sm rounded-2xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm flex items-center justify-center gap-2 transition duration-200">
+                        <button type="button" wire:click="addToCart({{ $pkg->id }})" class="w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-450 dark:hover:bg-emerald-900/30 text-center font-bold text-sm rounded-2xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm flex items-center justify-center gap-2 transition duration-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
                             Ikuti Lagi (Tambah Unit)
                         </button>
                     @else
-                        <button wire:click="addToCart({{ $pkg->id }})" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-center font-bold text-sm rounded-2xl shadow-md shadow-indigo-500/10 hover:shadow-indigo-500/20 transition duration-200">
+                        <button type="button" wire:click="addToCart({{ $pkg->id }})" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-center font-bold text-sm rounded-2xl shadow-md shadow-indigo-500/10 hover:shadow-indigo-500/20 transition duration-200">
                             Pilih Paket
                         </button>
                     @endif

@@ -178,6 +178,35 @@ php artisan test
 
 ---
 
+## 🔄 Langkah Pembaruan (Setelah Pull Perubahan)
+
+Jika Anda melakukan penarikan kode terbaru (misalnya dengan `git pull`), jalankan rangkaian perintah berikut untuk memperbarui database dan aset frontend Anda ke versi many-to-many terbaru:
+
+## first `git pull`
+
+1. **Jalankan Migrasi Database:**
+   Untuk menerapkan tabel pivot `package_user` yang baru dan memigrasikan data paket lama secara aman, jalankan:
+
+    ```bash
+    php artisan migrate
+    ```
+
+    _(Catatan: Jika ingin mereset database ke kondisi awal bawaan seeder baru, gunakan `php artisan migrate:fresh --seed`)_
+
+2. **Kompilasi Ulang Aset Frontend:**
+   Untuk memuat ikon keranjang dan modal checkout gabungan yang baru:
+
+    ```bash
+    npm run build
+    ```
+
+3. **Jalankan Pengujian (Opsional):**
+    ```bash
+    php artisan test
+    ```
+
+---
+
 ## 📊 Menampilkan & Mengekspor Diagram UML (PlantUML)
 
 Seluruh diagram sistem (Use Case, Activity, Sequence, Deployment, dan ERD) telah dibuat menggunakan format teks **PlantUML** di dalam direktori **`docs/`**.
@@ -185,25 +214,30 @@ Seluruh diagram sistem (Use Case, Activity, Sequence, Deployment, dan ERD) telah
 Berikut adalah panduan untuk menampilkan dan mengekspor diagram menjadi file gambar (PNG/SVG) di **VS Code (Windows)**:
 
 ### 1. Instalasi Ekstensi VS Code
+
 1. Buka VS Code.
 2. Klik menu **Extensions** di sebelah kiri (`Ctrl + Shift + X`).
-3. Cari ekstensi bernama **`PlantUML`** (oleh *jebbs*) dan klik **Install**.
+3. Cari ekstensi bernama **`PlantUML`** (oleh _jebbs_) dan klik **Install**.
 
 ### 2. Konfigurasi Instan (Tanpa Perlu Instal Java & Graphviz Lokal)
+
 Secara default, PlantUML membutuhkan Java dan Graphviz di komputer Anda. Namun, Anda dapat menggunakan server online publik bawaan agar diagram langsung ter-render secara instan:
+
 1. Di VS Code, buka **Settings** (`Ctrl + ,`).
 2. Cari kata kunci: **`plantuml server`**.
 3. Di bagian **`Plantuml: Render`**, ubah nilainya dari `Local` menjadi **`PlantUMLServer`**.
 4. Di bagian **`Plantuml: Server`**, pastikan nilainya adalah: `http://www.plantuml.com/plantuml` (ini adalah server resmi PlantUML).
 
 ### 3. Cara Menampilkan Preview Diagram
+
 1. Buka salah satu file diagram di folder `docs/` (misalnya: [docs/erd.puml](file:///Users/asepwahyudi/Documents/web/lebaran-fund-management/docs/erd.puml)).
 2. Tekan kombinasi tombol **`Alt + D`** pada keyboard Anda.
 3. Panel preview gambar diagram akan muncul secara real-time di sisi kanan layar VS Code.
 
 ### 4. Cara Mengekspor Diagram ke File Gambar (PNG/SVG)
+
 1. Pastikan Anda sedang membuka file `.puml` yang ingin diekspor.
-2. Tekan tombol **`F1`** atau **`Ctrl + Shift + P`** pada keyboard untuk membuka *Command Palette*.
+2. Tekan tombol **`F1`** atau **`Ctrl + Shift + P`** pada keyboard untuk membuka _Command Palette_.
 3. Ketik dan pilih perintah: **`PlantUML: Export Current Diagram`**.
 4. Pilih format gambar yang Anda inginkan (misalnya: **`png`** atau **`svg`**).
 5. File gambar hasil ekspor akan otomatis tersimpan di dalam subfolder **`docs/out/`** pada proyek Anda.

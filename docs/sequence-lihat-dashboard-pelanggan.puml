@@ -21,10 +21,10 @@ activate user
 user --> controller : return weeks array (status & deadlines)
 deactivate user
 
-controller -> package : get package image & details
-activate package
-package --> controller : return image_url
-deactivate package
+controller -> user : get active packages relation
+activate user
+user --> controller : return packages collection
+deactivate user
 
 controller --> view : menampilkan info paket, progress bar, & Kalender Cicilan
 deactivate controller

@@ -23,6 +23,7 @@ rectangle "Sistem Manajemen Tabungan Lebaran Sumber Sari" {
     ' Customer Use Cases
     usecase "Lihat Dashboard Pelanggan" as UC_ViewDashboard
     usecase "Lihat Kalender Cicilan" as UC_ViewCalendar
+    usecase "Kelola Keranjang & Checkout Paket" as UC_CartCheckout
     usecase "Unggah Bukti Transfer" as UC_UploadReceipt
     usecase "Lihat Riwayat Pembayaran" as UC_ViewHistory
 }
@@ -41,6 +42,7 @@ admin --> UC_PrintReports
 ' Customer Relationships
 customer --> UC_ViewDashboard
 customer --> UC_ViewCalendar
+customer --> UC_CartCheckout
 customer --> UC_UploadReceipt
 customer --> UC_ViewHistory
 

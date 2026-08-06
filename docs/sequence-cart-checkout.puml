@@ -1,0 +1,60 @@
+@startuml Sequence Diagram - Keranjang Belanja & Checkout Gabungan
+
+autonumber
+
+actor "Pelanggan (Customer)" as customer
+boundary "Halaman Katalog / Keranjang" as view
+control "Catalog / Cart Component (Livewire)" as controller
+control "CartBadge (Volt)" as badge
+entity "Session" as session
+entity "User Model" as user
+entity "Notification Model" as notification
+
+== Tambah ke Keranjang ==
+customer -> view : klik "Pilih Paket"
+view -> controller : addToCart(package_id)
+activate controller
+controller -> session : tambahkan item ke "cart" [id => qty]
+controller -> controller : dispatch('cart-updated')
+controller --> view : flash success & tombol "Lihat Keranjang"
+deactivate controller
+
+... Event Handling (Reactive Badge) ...
+badge -> session : read cart count
+activate badge
+badge --> view : update badge count (troli)
+deactivate badge
+
+== Mengakses & Mengedit Keranjang ==
+customer -> view : buka halaman Keranjang (/customer/cart)
+view -> controller : loadCart()
+activate controller
+controller -> session : read "cart" items
+controller -> controller : hitung subtotal & total setoran
+controller --> view : tampilkan daftar belanjaan & ringkasan
+deactivate controller
+
+customer -> view : ubah kuantitas paket (+ / -) atau hapus item
+view -> controller : updateQuantity(id, change) / removeItem(id)
+activate controller
+controller -> session : perbarui "cart" data
+controller -> controller : dispatch('cart-updated')
+controller --> view : render ulang data keranjang
+deactivate controller
+
+== Checkout Mandiri ==
+customer -> view : klik "Checkout Sekarang" & konfirmasi modal
+view -> controller : confirmCheckout()
+activate controller
+controller -> session : read "cart" items
+controller -> user : attach packages via pivot table (package_user)
+activate user
+user --> controller : return success
+deactivate user
+controller -> session : hapus key "cart" (clear)
+controller -> notification : create pendaftaran berhasil
+controller -> controller : dispatch('cart-updated')
+controller --> view : redirect ke Paket Saya (/customer/my-package)
+deactivate controller
+
+@endum

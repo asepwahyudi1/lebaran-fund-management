@@ -12,9 +12,6 @@ class User {
     +role: string
     +phone_number: string
     +address: string
-    +package_id: int
-    +start_date: Date
-    +duration_weeks: int
     --
     +getUser()
     +setUser()
@@ -78,9 +75,7 @@ class Customers {
     +email: string
     +phone_number: string
     +address: string
-    +package_id: int
-    +start_date: Date
-    +duration_weeks: int
+    +selectedPackages: array
     +isOpen: bool
     +isEditing: bool
     +editingId: int
@@ -105,9 +100,20 @@ class CustomerDashboard {
     +getUser()
 }
 
+class Cart {
+    +cartItems: array
+    +totalWeeklyInstallment: float
+    +isOpenCheckoutModal: bool
+    --
+    +loadCart()
+    +updateQuantity()
+    +removeItem()
+    +checkout()
+    +confirmCheckout()
+}
+
 ' Relations between Models
-User "0..*" --> "1" Package : belongs to
-Package "1" <-- "0..*" User : has many
+User "0..*" <--> "0..*" Package : many-to-many via package_user
 User "1" <-- "0..*" Payment : has many
 Payment "0..*" --> "1" User : made by
 Payment "0..*" --> "0..1" User : verified by
@@ -120,5 +126,7 @@ Customers ..> User : manipulates
 Customers ..> Package : queries
 CustomerDashboard ..> Payment : creates
 CustomerDashboard ..> User : queries
+Cart ..> Package : queries
+Cart ..> User : manipulates
 
 @endum

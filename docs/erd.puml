@@ -29,12 +29,18 @@ entity "users" as users {
     role : VARCHAR
     phone_number : VARCHAR (UNIQUE)
     address : TEXT
-    package_id : INT (FK)
-    start_date : DATE
-    * duration_weeks : INT
     remember_token : VARCHAR
     created_at : TIMESTAMP
     updated_at : TIMESTAMP
+}
+
+entity "package_user" as package_user {
+    * id : INT (PK)
+    --
+    * user_id : INT (FK)
+    * package_id : INT (FK)
+    * start_date : DATE
+    * duration_weeks : INT
 }
 
 entity "payments" as payments {
@@ -54,7 +60,8 @@ entity "payments" as payments {
 }
 
 ' Relationships
-packages ||..o{ users : "package_id"
+users ||..o{ package_user : "user_id"
+packages ||..o{ package_user : "package_id"
 users ||..o{ payments : "user_id"
 users ||..o{ payments : "verified_by"
 

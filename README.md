@@ -130,9 +130,13 @@ npm run dev
 
 1. Jalankan development server PHP:
     ```bash
+    # Untuk akses hanya dari komputer lokal:
     php artisan serve
+
+    # Untuk akses dari perangkat lain (seperti HP) di jaringan Wi-Fi yang sama:
+    php artisan serve --host=0.0.0.0
     ```
-2. Aplikasi akan berjalan di alamat: **`http://127.0.0.1:8000`**
+2. Aplikasi akan berjalan di alamat: **`http://127.0.0.1:8000`** (lokal) atau menggunakan IP lokal komputer Anda (contoh: **`http://192.168.1.15:8000`** pada browser perangkat lain).
 3. Buka alamat tersebut pada browser Anda.
 
 ---

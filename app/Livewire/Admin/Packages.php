@@ -83,10 +83,16 @@ class Packages extends Component
             $data['image_path'] = $this->image->store('packages', 'public');
         }
 
-        Package::updateOrCreate(
+        $package = Package::updateOrCreate(
             ['id' => $this->editingId],
             $data
         );
+
+        if ($this->isEditing) {
+            \Illuminate\Support\Facades\DB::table('package_user')
+                ->where('package_id', $package->id)
+                ->update(['duration_weeks' => $this->duration_weeks]);
+        }
 
         session()->flash('message', $this->isEditing ? 'Paket berhasil diperbarui.' : 'Paket berhasil ditambahkan.');
         

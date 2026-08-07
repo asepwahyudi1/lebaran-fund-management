@@ -88,7 +88,7 @@
                         <a href="{{ route('customer.dashboard') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition" wire:navigate>
                             Kembali
                         </a>
-                        <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition flex items-center gap-2">
+                        <button type="submit" wire:loading.attr="disabled" wire:target="proof" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             Kirim Bukti Pembayaran
                         </button>
                     </div>

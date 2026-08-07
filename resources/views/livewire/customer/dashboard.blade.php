@@ -260,7 +260,7 @@
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Akun Anda Belum Memiliki Paket Aktif</h3>
             <p class="text-sm max-w-md mx-auto mb-6">Silakan pilih salah satu paket Lebaran yang tersedia di katalog kami untuk memulai tabungan Anda.</p>
             <a href="{{ route('customer.catalog') }}" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow-md transition duration-200 inline-flex items-center gap-2" wire:navigate>
-                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                 </svg>
                 Lihat Katalog Paket

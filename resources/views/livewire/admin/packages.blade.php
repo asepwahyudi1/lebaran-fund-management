@@ -167,7 +167,8 @@
                             @endif
                             
                             <div class="flex-1">
-                                <input type="file" wire:model="image" id="package_image" class="hidden">
+                                <input type="file" wire:model="image" id="package_image" class="hidden"
+                                       onchange="if (this.files[0] && this.files[0].size > 2 * 1024 * 1024) { alert('Ukuran gambar terlalu besar! Maksimal 2MB.'); this.value = ''; event.preventDefault(); return false; }">
                                 <label for="package_image" class="px-4 py-2 border border-gray-350 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer inline-block">
                                     Pilih Gambar
                                 </label>

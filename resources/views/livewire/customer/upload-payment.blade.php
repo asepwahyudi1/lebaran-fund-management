@@ -50,7 +50,8 @@
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Unggah Gambar Bukti Transfer</label>
                         
                         <div class="relative bg-gray-50 dark:bg-gray-800/40 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-indigo-400 transition p-6 flex flex-col items-center justify-center text-center">
-                            <input type="file" wire:model="proof" id="proof" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" required>
+                            <input type="file" wire:model="proof" id="proof" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" required
+                                   onchange="if (this.files[0] && this.files[0].size > 2 * 1024 * 1024) { alert('Ukuran berkas terlalu besar! Maksimal adalah 2MB.'); this.value = ''; event.preventDefault(); return false; }">
                             
                             <div class="space-y-2 pointer-events-none">
                                 <svg class="w-10 h-10 text-gray-400 dark:text-gray-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
